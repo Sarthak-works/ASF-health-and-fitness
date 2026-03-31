@@ -21,7 +21,7 @@ export const metadata: Metadata = {
   title: 'ASF Health & Fitness | Performance for Entrepreneurs',
   description: 'Built for entrepreneurs and business leaders to sustain success through health and fitness.',
   icons: {
-    icon: '/logoasf.webp',
+    icon: '/100X100-ASF.png',
   },
 }
 

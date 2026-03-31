@@ -66,8 +66,11 @@ const contactDetails = [
   {
     icon: Phone,
     label: "Phone",
-    value: "+971 589485094",
-    href: "tel:+971589485094",
+    values: [
+      { text: "+971 589485094", href: "tel:+971589485094" },
+      { text: "+971 54 381 4174", href: "tel:+971543814174" },
+      { text: "+971 54 275 3245", href: "tel:+971542753245" },
+    ],
   },
   { icon: Clock, label: "Hours", value: "Mon–Sat: 6AM–8PM  |  Sunday: Closed" },
 ];
@@ -227,7 +230,7 @@ export default function ContactFooter() {
               </div>
 
               <div className="space-y-4 mb-6">
-                {contactDetails.map((item, i) => {
+                {contactDetails.map((item: any, i) => {
                   const Content = (
                     <>
                       <div className="bg-accent/10 p-2 rounded-xl flex-shrink-0">
@@ -237,9 +240,19 @@ export default function ContactFooter() {
                         <p className="text-[10px] text-gray-500 uppercase tracking-wider font-semibold mb-0.5">
                           {item.label}
                         </p>
-                        <p className="text-white text-xs font-medium">
-                          {item.value}
-                        </p>
+                        {item.values ? (
+                          <div className="flex flex-col gap-1.5 mt-0.5 pb-1">
+                            {item.values.map((v: any, idx: number) => (
+                              <a key={idx} href={v.href} className="text-white hover:text-accent font-medium text-xs transition-colors duration-200 block truncate">
+                                {v.text}
+                              </a>
+                            ))}
+                          </div>
+                        ) : (
+                          <p className="text-white text-xs font-medium">
+                            {item.value}
+                          </p>
+                        )}
                       </div>
                     </>
                   );

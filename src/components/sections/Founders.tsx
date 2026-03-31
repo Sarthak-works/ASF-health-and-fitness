@@ -51,6 +51,16 @@ const teamCards = [
     title: "Tharushi",
     role: "Coach",
     src: "/coach-tharushi.webp",
+  },
+  {
+    title: "Harsha Nachane",
+    role: "Coach",
+    src: "/harsha.jpeg",
+  },
+  {
+    title: "swanil",
+    role: "Coach",
+    src: "/swanil.jpeg",
   }
 ];
 

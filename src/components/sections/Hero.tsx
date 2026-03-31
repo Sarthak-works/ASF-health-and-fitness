@@ -162,7 +162,7 @@ export default function Hero() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8 }}
               className="font-black text-purple tracking-tight font-heading leading-tight mb-8 text-center whitespace-nowrap overflow-visible"
-              style={{ fontSize: "clamp(18px, 5vw, 72px)" }}
+              style={{ fontSize: "clamp(32px, 8vw, 72px)" }}
             >
               <FlipWords
                 words={[
@@ -170,7 +170,7 @@ export default function Hero() {
                   "ADAPTIVE. SUSTAINABLE. FITNESS.",
                 ]}
                 duration={4000}
-                className="text-purple block"
+                className="text-purple max-md:flex max-md:flex-col max-md:items-center"
               />
             </motion.h1>
           </div>

@@ -93,7 +93,7 @@ export default function About() {
 
             <div className="space-y-4 text-black text-base leading-relaxed mb-6">
               <TextGenerateEffect
-                words="ASF Health & Fitness is a dedicated fitness and wellness team based in Dubai, specialising in helping entrepreneurs and busy professionals elevate their physical and mental well-being. With over a decade of experience, we focus on tailored fitness strategies that enhance energy, mental clarity, resilience, and overall vitality all designed to help you perform at your peak in every area of life."
+                words="ASF Coaching is a dedicated fitness and wellness team based in Dubai, specialising in helping entrepreneurs and busy professionals elevate their physical and mental well-being. With over a decade of experience, we focus on tailored fitness strategies that enhance energy, mental clarity, resilience, and overall vitality all designed to help you perform at your peak in every area of life."
                 className="text-black font-normal"
               />
               <TextGenerateEffect

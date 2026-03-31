@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -109,6 +109,38 @@ const formFields = [
 const GOOGLE_SCRIPT_URL =
   "https://script.google.com/macros/s/AKfycbxa05fSTwEiNXmTSnvW1bhw6pSB1PcaKi6LhqlyiPw2i0Q0vOEhGjMwLXdA5ELKgvvo/exec";
 
+function TransparentFooterVideo({ src, width, height, className }: any) {
+  return (
+    <div className={className} style={{ position: "relative", width, height, maxWidth: "100%" }}>
+      <svg width="0" height="0" style={{ position: "absolute" }}>
+        <filter id="chroma-key-footer">
+          {/* 
+            This matrix precisely strips the purple background (high Blue, low Green/Red) 
+            while keeping the yellow logo (high Red/Green, low Blue) perfectly opaque.
+            Alpha = 1*R + 1*G - 1*B - 0.1
+          */}
+          <feColorMatrix type="matrix" values="
+            1 0 0 0 0
+            0 1 0 0 0
+            0 0 1 0 0
+            1 1 -1 0 -0.15
+          " />
+        </filter>
+      </svg>
+      <video
+        src={src}
+        autoPlay
+        loop
+        muted
+        playsInline
+        width={width}
+        height={height}
+        style={{ width: "100%", height: "100%", objectFit: "contain", filter: "url(#chroma-key-footer)" }}
+      />
+    </div>
+  );
+}
+
 export default function ContactFooter() {
   const router = useRouter();
   const [submitted, setSubmitted] = useState(false);
@@ -183,12 +215,11 @@ export default function ContactFooter() {
               transition={{ duration: 0.7 }}
             >
               <div className="mb-6">
-                <Image
-                  src="/logoasf.webp"
-                  alt="ASF Fitness Logo"
-                  width={144}
-                  height={48}
-                  className="h-10 md:h-12 w-auto object-contain mb-2"
+                <TransparentFooterVideo
+                  src="/logov.mp4"
+                  width={180}
+                  height={72}
+                  className="h-16 md:h-20 w-auto object-contain mb-2"
                 />
                 <p className="text-gray-400 mt-1 text-xs">
                   High Performance. Real Results.
@@ -512,12 +543,11 @@ export default function ContactFooter() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
           <div className="flex flex-col md:flex-row items-center justify-between gap-6">
             <div className="flex-shrink-0">
-              <Image
-                src="/logoasf.webp"
-                alt="ASF Fitness Logo"
-                width={120}
-                height={40}
-                className="h-8 md:h-10 w-auto object-contain"
+              <TransparentFooterVideo
+                src="/logov.mp4"
+                width={150}
+                height={50}
+                className="h-12 md:h-16 w-auto object-contain"
               />
             </div>
 

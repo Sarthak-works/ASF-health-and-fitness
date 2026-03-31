@@ -1,10 +1,10 @@
-'use client';
+"use client";
 
-import { motion, useScroll, useTransform, useInView } from 'framer-motion';
-import { useRef } from 'react';
-import { Spotlight } from '@/components/ui/Spotlight';
-import { TextGenerateEffect } from '@/components/ui/TextGenerateEffect';
-import { FlipWords } from '@/components/ui/flip-words';
+import { motion, useScroll, useTransform, useInView } from "framer-motion";
+import { useRef } from "react";
+import { Spotlight } from "@/components/ui/Spotlight";
+import { TextGenerateEffect } from "@/components/ui/TextGenerateEffect";
+import { FlipWords } from "@/components/ui/flip-words";
 
 function ThickRibbon() {
   const colors = [
@@ -83,7 +83,7 @@ function ThickRibbon() {
                 duration: duration,
                 repeat: Infinity,
                 ease: "easeInOut",
-                delay: delay
+                delay: delay,
               }}
               style={{
                 filter: i % 10 === 0 ? "url(#ribbonGlow)" : "none",
@@ -109,7 +109,7 @@ function ThickRibbon() {
               duration: 8 + i * 2,
               repeat: Infinity,
               ease: "easeInOut",
-              delay: i * 0.5
+              delay: i * 0.5,
             }}
             filter="url(#ribbonGlow)"
           />
@@ -121,7 +121,10 @@ function ThickRibbon() {
 
 export default function Hero() {
   const containerRef = useRef<HTMLElement>(null);
-  const { scrollYProgress } = useScroll({ target: containerRef, offset: ["start start", "end start"] });
+  const { scrollYProgress } = useScroll({
+    target: containerRef,
+    offset: ["start start", "end start"],
+  });
   const yTranslate = useTransform(scrollYProgress, [0, 1], [0, 150]);
   const opacity = useTransform(scrollYProgress, [0, 0.5], [1, 0]);
 
@@ -134,7 +137,10 @@ export default function Hero() {
       className="relative min-h-[85vh] flex flex-col items-center justify-center overflow-hidden bg-white pt-32 pb-8 md:pb-12"
     >
       {/* Visual background accents */}
-      <Spotlight className="absolute -top-40 left-1/2 -translate-x-1/2 z-0" fill="#F1FF03" />
+      <Spotlight
+        className="absolute -top-40 left-1/2 -translate-x-1/2 z-0"
+        fill="#F1FF03"
+      />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full z-10 flex flex-col items-center text-center">
         {/* Centered Text Content */}
@@ -155,12 +161,16 @@ export default function Hero() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8 }}
-              className="text-[36px] sm:text-4xl md:text-5xl lg:text-7xl font-black text-purple tracking-tight font-heading leading-tight mb-8 text-center whitespace-nowrap overflow-visible"
+              className="font-black text-purple tracking-tight font-heading leading-tight mb-8 text-center whitespace-nowrap overflow-visible"
+              style={{ fontSize: "clamp(18px, 5vw, 72px)" }}
             >
-              <FlipWords 
-                words={["ADAPTIVE. SUSTAINABLE. FITNESS.", "ADAPTIVE. SUSTAINABLE. FITNESS."]} 
-                duration={4000} 
-                className="text-purple block" 
+              <FlipWords
+                words={[
+                  "ADAPTIVE. SUSTAINABLE. FITNESS.",
+                  "ADAPTIVE. SUSTAINABLE. FITNESS.",
+                ]}
+                duration={4000}
+                className="text-purple block"
               />
             </motion.h1>
           </div>
@@ -170,7 +180,6 @@ export default function Hero() {
               words="Master your fitness, master your life."
               className="text-base md:text-2xl text-black font-bold tracking-tight"
             />
-
           </div>
 
           <motion.a
@@ -179,7 +188,9 @@ export default function Hero() {
             whileTap={{ scale: 0.98 }}
             className="group relative inline-flex h-16 items-center justify-center overflow-hidden rounded-full bg-purple px-8 md:px-14 font-bold text-white transition-all duration-300 hover:bg-yellow hover:text-black hover:shadow-[0_20px_60px_-10px_rgba(241,255,3,0.5)] z-50 border border-purple shadow-sm w-full max-w-[320px] md:w-auto"
           >
-            <span className="relative z-10 text-sm tracking-[0.2em] uppercase text-center">Book your free assessment</span>
+            <span className="relative z-10 text-sm tracking-[0.2em] uppercase text-center">
+              Book your free assessment
+            </span>
             <div className="absolute inset-0 z-0 bg-gradient-to-r from-zinc-100/0 via-zinc-100/20 to-zinc-100/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000" />
           </motion.a>
         </motion.div>

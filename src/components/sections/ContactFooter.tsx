@@ -21,6 +21,7 @@ import {
   Apple,
   Smartphone,
 } from "lucide-react";
+import { FaAppStoreIos, FaGooglePlay } from "react-icons/fa";
 import { TextGenerateEffect } from "@/components/ui/TextGenerateEffect";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
@@ -46,7 +47,7 @@ const navLinks = [
   "Founder",
   "Team",
   "FAQ",
-  "Blog",
+  // "Blog",
   "Contact",
 ];
 
@@ -187,9 +188,9 @@ export default function ContactFooter() {
           <div />
         </BackgroundBeamsWithCollision>
 
-        <div className="absolute inset-0 z-[1] overflow-hidden">
+        {/* <div className="absolute inset-0 z-[1] overflow-hidden">
           <Meteors number={18} />
-        </div>
+        </div> */}
 
         <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full flex flex-col justify-center">
           <motion.div
@@ -329,7 +330,7 @@ export default function ContactFooter() {
                     whileHover={{ y: -3 }}
                     className="flex items-center gap-3 bg-white/5 hover:bg-white/10 border border-white/10 p-3 rounded-2xl transition-all group"
                   >
-                    <Apple className="w-6 h-6 text-white group-hover:text-accent transition-colors" />
+                    <FaAppStoreIos className="w-6 h-6 text-white group-hover:text-accent transition-colors" />
                     <div className="text-left">
                       <p className="text-[9px] text-gray-500 uppercase font-bold leading-none mb-1">
                         Download on
@@ -350,7 +351,7 @@ export default function ContactFooter() {
                     whileHover={{ y: -3 }}
                     className="flex items-center gap-3 bg-white/5 hover:bg-white/10 border border-white/10 p-3 rounded-2xl transition-all group"
                   >
-                    <Smartphone className="w-6 h-6 text-white group-hover:text-accent transition-colors" />
+                    <FaGooglePlay className="w-5 h-5 text-white group-hover:text-accent transition-colors" />
                     <div className="text-left">
                       <p className="text-[9px] text-gray-500 uppercase font-bold leading-none mb-1">
                         Get it on

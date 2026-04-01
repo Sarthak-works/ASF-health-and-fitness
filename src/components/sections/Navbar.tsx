@@ -14,7 +14,7 @@ const navLinks = [
   { name: 'Our Team', href: '#team' },
   { name: 'Services', href: '#services' },
   { name: 'FAQ', href: '#faq' },
-  { name: 'Blog', href: '#blog' },
+  // { name: 'Blog', href: '#blog' },
   { name: 'Contact Us', href: '#contact' },
 ];
 
@@ -179,7 +179,7 @@ export default function Navbar() {
               </div>
 
               <div className="flex flex-col space-y-6">
-                {navLinks.map((link) => (
+                {navLinks.filter(l => l.name !== 'Contact Us').map((link) => (
                   <a
                     key={link.name}
                     href={link.href}
@@ -189,9 +189,9 @@ export default function Navbar() {
                     {link.name}
                   </a>
                 ))}
-                <button className="mt-4 bg-yellow text-black px-6 py-4 rounded-full text-sm font-bold shadow-lg hover:bg-white transition-all">
+                <a href="#contact" onClick={() => setIsOpen(false)} className="mt-4 bg-yellow text-black px-6 py-4 rounded-full text-sm font-bold shadow-lg hover:bg-white transition-all text-center">
                   Register Your Interest
-                </button>
+                </a>
               </div>
             </motion.div>
           </>

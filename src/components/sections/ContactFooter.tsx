@@ -618,8 +618,11 @@ export default function ContactFooter() {
 
         <div className="border-t border-white/5">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-            <div className="flex flex-col sm:flex-row flex-wrap justify-center items-center gap-2 text-center text-xs text-gray-600">
-              <span>Copyright © 2025 ASF Fitness. All Rights Reserved.</span>
+            <div className="flex flex-col sm:flex-row flex-wrap justify-center items-center gap-2 text-center text-xs text-gray-500">
+              <span>
+                Copyright © 2026 Akshay Sahu Sports Coaching Services LLC All
+                Rights Reserved.
+              </span>
               <span className="hidden sm:inline text-gray-700">|</span>
               <span>
                 Built with passion by{" "}

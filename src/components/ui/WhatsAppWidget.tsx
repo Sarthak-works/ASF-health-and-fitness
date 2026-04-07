@@ -1,11 +1,13 @@
-'use client';
+"use client";
 
-import { motion } from 'framer-motion';
+import { motion } from "framer-motion";
 
 export default function WhatsAppWidget() {
-  // Use the verified business number without spaces/symbols for the wa.me link
-  const whatsappNumber = '971589485094';
-  const whatsappMessage = encodeURIComponent('Hi ASF Fitness! I would like to know more about your coaching programs.');
+  // Use the verified business number without spaces/symbols for the wa.me link 971543814174
+  const whatsappNumber = "971543814174";
+  const whatsappMessage = encodeURIComponent(
+    "Hi ASF Coaching! I would like to know more about your coaching programs.",
+  );
 
   return (
     <motion.a
@@ -14,7 +16,7 @@ export default function WhatsAppWidget() {
       rel="noopener noreferrer"
       initial={{ scale: 0, opacity: 0 }}
       animate={{ scale: 1, opacity: 1 }}
-      transition={{ type: 'spring', stiffness: 260, damping: 20, delay: 1 }}
+      transition={{ type: "spring", stiffness: 260, damping: 20, delay: 1 }}
       whileHover={{ scale: 1.1 }}
       whileTap={{ scale: 0.95 }}
       className="fixed bottom-6 right-6 z-[100] flex items-center justify-center w-14 h-14 bg-[#25D366] text-white rounded-full shadow-2xl hover:shadow-[0_0_25px_rgba(37,211,102,0.6)] transition-shadow duration-300"

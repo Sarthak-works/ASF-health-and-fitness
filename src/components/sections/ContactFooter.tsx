@@ -55,7 +55,8 @@ const contactDetails = [
   {
     icon: MapPin,
     label: "Address",
-    value: "Fonds Building, Sheikh Zayed Road, Office 2, Dubai, UAE",
+    companyName: "Akshay Sahu Sports Coaching Services LLC",
+    value: " Fonds Building, Sheikh Zayed Road, Office 2, Dubai, UAE",
     href: "https://maps.google.com/?q=Fonds+Building+Sheikh+Zayed+Road+Office+2+Dubai",
   },
   {
@@ -68,7 +69,6 @@ const contactDetails = [
     icon: Phone,
     label: "Phone",
     values: [
-      { text: "+971 589485094", href: "tel:+971589485094" },
       { text: "+971 54 381 4174", href: "tel:+971543814174" },
       { text: "+971 54 275 3245", href: "tel:+971542753245" },
     ],
@@ -115,7 +115,10 @@ const GOOGLE_SCRIPT_URL =
 
 function TransparentFooterVideo({ src, width, height, className }: any) {
   return (
-    <div className={className} style={{ position: "relative", width, height, maxWidth: "100%" }}>
+    <div
+      className={className}
+      style={{ position: "relative", width, height, maxWidth: "100%" }}
+    >
       <svg width="0" height="0" style={{ position: "absolute" }}>
         <filter id="chroma-key-footer">
           {/* 
@@ -123,12 +126,15 @@ function TransparentFooterVideo({ src, width, height, className }: any) {
             while keeping the yellow logo (high Red/Green, low Blue) perfectly opaque.
             Alpha = 1*R + 1*G - 1*B - 0.1
           */}
-          <feColorMatrix type="matrix" values="
+          <feColorMatrix
+            type="matrix"
+            values="
             1 0 0 0 0
             0 1 0 0 0
             0 0 1 0 0
             1 1 -1 0 -0.15
-          " />
+          "
+          />
         </filter>
       </svg>
       <video
@@ -139,7 +145,12 @@ function TransparentFooterVideo({ src, width, height, className }: any) {
         playsInline
         width={width}
         height={height}
-        style={{ width: "100%", height: "100%", objectFit: "contain", filter: "url(#chroma-key-footer)" }}
+        style={{
+          width: "100%",
+          height: "100%",
+          objectFit: "contain",
+          filter: "url(#chroma-key-footer)",
+        }}
       />
     </div>
   );
@@ -244,15 +255,26 @@ export default function ContactFooter() {
                         {item.values ? (
                           <div className="flex flex-col gap-1.5 mt-0.5 pb-1">
                             {item.values.map((v: any, idx: number) => (
-                              <a key={idx} href={v.href} className="text-white hover:text-accent font-medium text-xs transition-colors duration-200 block truncate">
+                              <a
+                                key={idx}
+                                href={v.href}
+                                className="text-white hover:text-accent font-medium text-xs transition-colors duration-200 block truncate"
+                              >
                                 {v.text}
                               </a>
                             ))}
                           </div>
                         ) : (
-                          <p className="text-white text-xs font-medium">
-                            {item.value}
-                          </p>
+                          <div>
+                            {item.companyName && (
+                              <p className="text-white text-xs font-semibold mb-1">
+                                {item.companyName}
+                              </p>
+                            )}
+                            <p className="text-white text-xs font-medium">
+                              {item.value}
+                            </p>
+                          </div>
                         )}
                       </div>
                     </>

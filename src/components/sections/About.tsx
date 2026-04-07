@@ -1,8 +1,8 @@
-'use client';
+"use client";
 
-import { motion } from 'framer-motion';
-import { CheckCircle2 } from 'lucide-react';
-import Image from 'next/image';
+import { motion } from "framer-motion";
+import { CheckCircle2 } from "lucide-react";
+import Image from "next/image";
 import { AnimatedTooltip } from "@/components/ui/AnimatedTooltip";
 import { CardSpotlight } from "@/components/ui/CardSpotlight";
 import { TextGenerateEffect } from "@/components/ui/TextGenerateEffect";
@@ -20,22 +20,24 @@ const teamTooltip = [
     id: 1,
     name: "ASF Team",
     designation: "Dubai's Finest Coaches",
-    image: '/asfTeam.webp',
-  }
+    image: "/asfTeam.webp",
+  },
 ];
 
 export default function About() {
   return (
-    <section id="about" className="min-h-[85vh] flex items-center bg-white overflow-hidden pt-10 pb-20 lg:pt-12 lg:pb-24">
+    <section
+      id="about"
+      className="min-h-[85vh] flex items-center bg-white overflow-hidden pt-10 pb-20 lg:pt-12 lg:pb-24"
+    >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-16 items-center">
-
           {/* Left: Global Wellness Imagery with 3D Card */}
           <motion.div
             initial={{ opacity: 0, x: -50 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
-            transition={{ duration: 0.8, ease: 'easeOut' }}
+            transition={{ duration: 0.8, ease: "easeOut" }}
             className="relative w-full"
           >
             <CardContainer className="inter-var w-full h-full">
@@ -45,7 +47,7 @@ export default function About() {
                   className="w-full h-[300px] md:h-[500px] lg:h-[650px]"
                 >
                   <Image
-                    src='/asfTeam.webp'
+                    src="/asfTeam-highres.jpg"
                     alt="ASF Wellness-First Influence"
                     fill
                     className="object-cover transition-all duration-700 rounded-2xl"
@@ -61,7 +63,7 @@ export default function About() {
               initial={{ scale: 0, opacity: 0 }}
               whileInView={{ scale: 1, opacity: 1 }}
               viewport={{ once: true }}
-              transition={{ delay: 0.6, type: 'spring', stiffness: 200 }}
+              transition={{ delay: 0.6, type: "spring", stiffness: 200 }}
               className="absolute -bottom-6 -right-4 md:-bottom-8 md:-right-8 z-20 scale-75 md:scale-100"
             >
               <div className="bg-white p-4 md:p-6 rounded-2xl shadow-xl flex items-center gap-3 md:gap-4 border border-gray-100">
@@ -69,7 +71,9 @@ export default function About() {
                   <AnimatedTooltip items={teamTooltip} />
                 </div>
                 <div>
-                  <p className="text-lg md:text-xl font-bold text-black leading-none whitespace-nowrap">10+ Years Experience</p>
+                  <p className="text-lg md:text-xl font-bold text-black leading-none whitespace-nowrap">
+                    10+ Years Experience
+                  </p>
                 </div>
               </div>
             </motion.div>
@@ -80,7 +84,7 @@ export default function About() {
             initial={{ opacity: 0, x: 50 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
-            transition={{ duration: 0.8, ease: 'easeOut' }}
+            transition={{ duration: 0.8, ease: "easeOut" }}
             className="mt-8 lg:mt-0"
           >
             <span className="section-label mb-4">ABOUT US</span>
@@ -113,9 +117,14 @@ export default function About() {
                   className="flex items-center gap-4 group"
                 >
                   <div className="bg-purple/10 p-1 rounded-full group-hover:bg-purple transition-colors duration-300">
-                    <CheckCircle2 className="text-purple group-hover:text-white transition-colors duration-300" size={18} />
+                    <CheckCircle2
+                      className="text-purple group-hover:text-white transition-colors duration-300"
+                      size={18}
+                    />
                   </div>
-                  <span className="text-dark font-semibold leading-tight">{item}</span>
+                  <span className="text-dark font-semibold leading-tight">
+                    {item}
+                  </span>
                 </motion.div>
               ))}
             </div>
@@ -129,10 +138,8 @@ export default function About() {
               Book your free assessment
             </motion.a>
           </motion.div>
-
         </div>
       </div>
     </section>
   );
 }
-

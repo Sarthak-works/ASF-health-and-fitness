@@ -6,6 +6,7 @@ import LeadPopup from "@/components/ui/LeadPopup";
 import WhatsAppWidget from "@/components/ui/WhatsAppWidget";
 import GoogleAnalytics from "@/components/GoogleAnalytics";
 import MetaPixel from "@/components/MetaPixel";
+import { ThemeProvider } from "next-themes";
 const playfair = Playfair_Display({
   subsets: ["latin"],
   variable: "--font-playfair",
@@ -46,7 +47,10 @@ export default function RootLayout({
         className={`${playfair.variable} ${montserrat.variable} font-sans antialiased text-dark bg-white`}
       >
         <LenisProvider>
-          {children}
+          <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+            {children}
+          </ThemeProvider>
+
           <LeadPopup />
           <WhatsAppWidget />
         </LenisProvider>

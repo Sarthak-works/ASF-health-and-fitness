@@ -1,26 +1,24 @@
-'use client';
+"use client";
 
-import { motion } from 'framer-motion';
+import { motion } from "framer-motion";
 import { CardBody, CardContainer, CardItem } from "@/components/ui/3d-card";
 
 export default function Founder() {
   const founders = [
-
     {
       name: "Suraj Shetty",
       role: "CEO Asf Dubai",
       image: "/Suraj.jpg",
-      bio: "12+ Years Coaching Experience | 300+ Clients Trained",
-      objectPosition: "center 15%"
+      bio: "12+ yrs. Coaching Experience | 300+ Clients Trained",
+      objectPosition: "center 15%",
     },
     {
       name: "Akshay Sahu",
       role: "CMO Asf Dubai",
       image: "/Akshay.jpg",
       bio: "10+ yrs. Coaching exp. | 200+ Clients Trained",
-      objectPosition: "center center"
+      objectPosition: "center center",
     },
-
   ];
 
   return (
@@ -66,12 +64,13 @@ export default function Founder() {
                       className="w-full h-full object-cover group-hover/card:scale-110 transition-transform duration-500"
                     />
                   </CardItem>
-                  <CardItem
-                    translateZ="50"
-                    className="text-left"
-                  >
-                    <h3 className="text-2xl font-bold text-dark">{founder.name}</h3>
-                    <p className="text-gray-500 font-semibold text-sm uppercase tracking-wider mt-1">{founder.role}</p>
+                  <CardItem translateZ="50" className="text-left">
+                    <h3 className="text-2xl font-bold text-dark">
+                      {founder.name}
+                    </h3>
+                    <p className="text-gray-500 font-semibold text-sm uppercase tracking-wider mt-1">
+                      {founder.role}
+                    </p>
                     <p className="text-gray-500 mt-4 leading-relaxed font-sans text-lg">
                       {founder.bio}
                     </p>
@@ -85,6 +84,3 @@ export default function Founder() {
     </section>
   );
 }
-
-
-

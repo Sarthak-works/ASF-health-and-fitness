@@ -1,3 +1,4 @@
+//ui/map.tsx
 "use client";
 
 import MapLibreGL, { type PopupOptions, type MarkerOptions } from "maplibre-gl";

@@ -11,7 +11,7 @@ const Transformations = dynamic(
 const Testimonials = dynamic(
   () => import("@/components/sections/Testimonials"),
 );
-const Founders = dynamic(() => import("@/components/sections/Founders"));
+const Team = dynamic(() => import("@/components/sections/Team"));
 const Founder = dynamic(() => import("@/components/sections/Founder"));
 const Services = dynamic(() => import("@/components/sections/Services"));
 const Stats = dynamic(() => import("@/components/sections/Stats"));
@@ -30,7 +30,7 @@ export default function Home() {
       <Transformations />
       <Testimonials />
       <Founder />
-      <Founders />
+      <Team />
       <Services />
       <Stats />
       <FAQ />

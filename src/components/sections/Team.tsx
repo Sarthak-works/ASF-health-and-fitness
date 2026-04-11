@@ -1,6 +1,6 @@
-'use client';
+"use client";
 
-import { motion } from 'framer-motion';
+import { motion } from "framer-motion";
 import { FocusCards } from "@/components/ui/focus-cards";
 import { CardContainer, CardBody, CardItem } from "@/components/ui/3d-card";
 
@@ -15,7 +15,11 @@ const teamCards = [
     role: "Founder & Head Coach",
     src: "/coach-akshay.webp",
   },
-
+  {
+    title: "Hoyam Ahmed",
+    role: "Fitness Coach",
+    src: "/coach-hoyam.webp",
+  },
   {
     title: "Karthik Jadhav",
     role: "Performance Coach",
@@ -26,12 +30,6 @@ const teamCards = [
     role: "Strength Coach",
     src: "/coach-hasnain.webp",
   },
-  {
-    title: "Hoyam Ahmed",
-    role: "Fitness Coach",
-    src: "/coach-hoyam.webp",
-  },
-
   {
     title: "Dileef Thahir",
     role: "Elite Trainer",
@@ -61,10 +59,10 @@ const teamCards = [
     title: "swanil",
     role: "Coach",
     src: "/swanil.jpeg",
-  }
+  },
 ];
 
-// Custom Card UI to be used by FocusCards if we wanted a custom render, 
+// Custom Card UI to be used by FocusCards if we wanted a custom render,
 // but Aceternity's FocusCards has its own Card component.
 // However, the user wants 3D tilt perspective ON trainer cards ON hover (Aceternity 3D Card Effect)
 // And Focus Cards (hover focus with blur for team grid).
@@ -91,7 +89,8 @@ export default function OurTeam() {
           transition={{ delay: 0.1 }}
           className="text-gray-600 max-w-2xl mx-auto mb-16 text-lg"
         >
-          Our certified trainers bring years of experience and a passion for helping you achieve your goals.
+          Our certified trainers bring years of experience and a passion for
+          helping you achieve your goals.
         </motion.p>
 
         <div>

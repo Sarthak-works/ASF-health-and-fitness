@@ -1,3 +1,4 @@
+//Map.tsx
 "use client";
 
 import {
@@ -8,7 +9,7 @@ import {
   MarkerPopup,
   MapControls,
 } from "@/components/ui/map";
-
+import { useEffect, useState } from "react";
 const dubaiLocations = [
   {
     id: 1,
@@ -94,6 +95,13 @@ const dubaiLocations = [
 ];
 
 export default function MapSection() {
+  const [isMobile, setIsMobile] = useState(false);
+  useEffect(() => {
+    const check = () => setIsMobile(window.innerWidth < 768);
+    check();
+    window.addEventListener("resize", check);
+    return () => window.removeEventListener("resize", check);
+  }, []);
   return (
     <section className="flex flex-col bg-white overflow-hidden pt-0 pb-20">
       <div className="text-center mb-12 px-4">
@@ -109,7 +117,14 @@ export default function MapSection() {
 
       {/* Map */}
       <div className="w-full h-[560px]">
-        <Map center={[55.2962, 25.2048]} zoom={10.5}>
+        <Map
+          center={[55.2962, 25.2048]}
+          zoom={10.5}
+          scrollZoom={!isMobile}
+          touchZoomRotate={!isMobile}
+          touchPitch={!isMobile}
+          dragPan={!isMobile}
+        >
           <MapControls
             position="bottom-right"
             showZoom

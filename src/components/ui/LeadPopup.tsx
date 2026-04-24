@@ -12,13 +12,18 @@ import { Button as MovingBorderButton } from "@/components/ui/moving-border";
 const schema = z.object({
   name: z.string().min(2, "Name is required"),
   email: z.string().email("Valid email required"),
-  phone: z.string().min(6, "Phone number required"),
+  phone: z
+    .string()
+    .regex(
+      /^\+971[- ]?5[0-9][- ]?\d{7}$/,
+      "Enter a valid UAE mobile number (e.g. +971 50 1234567)",
+    ),
 });
 
 type FormData = z.infer<typeof schema>;
 
 const GOOGLE_SCRIPT_URL =
-  "https://script.google.com/macros/s/AKfycbxa05fSTwEiNXmTSnvW1bhw6pSB1PcaKi6LhqlyiPw2i0Q0vOEhGjMwLXdA5ELKgvvo/exec";
+  "https://script.google.com/macros/s/AKfycbzXau9Zj0C2Z2yPm_37Pb3k2SJb6K0lCilKQRbq2KJmQ2bDxpVPf7soXj9kTyB85P6H/exec";
 
 export default function LeadPopup() {
   const [isOpen, setIsOpen] = useState(false);

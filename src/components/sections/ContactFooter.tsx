@@ -6,7 +6,6 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { BackgroundBeamsWithCollision } from "@/components/ui/background-beams-with-collision";
-import { Meteors } from "@/components/ui/meteors";
 import { Input, Label } from "@/components/ui/signup-form-elements";
 import { Button as MovingBorderButton } from "@/components/ui/moving-border";
 import {
@@ -18,8 +17,6 @@ import {
   Instagram,
   Linkedin,
   Send,
-  Apple,
-  Smartphone,
 } from "lucide-react";
 import { FaAppStoreIos, FaGooglePlay } from "react-icons/fa";
 import { TextGenerateEffect } from "@/components/ui/TextGenerateEffect";
@@ -29,7 +26,12 @@ import { useRouter } from "next/navigation";
 const schema = z.object({
   name: z.string().min(2, "Name is required"),
   email: z.string().email("Valid email required"),
-  phone: z.string().min(6, "Phone number required"),
+  phone: z
+    .string()
+    .regex(
+      /^\+971[- ]?5[0-9][- ]?\d{7}$/,
+      "Enter a valid UAE mobile number (e.g. +971 50 1234567)",
+    ),
   coachingType: z.string().min(1, "Please select a coaching type"),
   budget: z.string().min(1, "Please select a budget scale"),
   message: z
@@ -111,7 +113,7 @@ const formFields = [
 ];
 
 const GOOGLE_SCRIPT_URL =
-  "https://script.google.com/macros/s/AKfycbxa05fSTwEiNXmTSnvW1bhw6pSB1PcaKi6LhqlyiPw2i0Q0vOEhGjMwLXdA5ELKgvvo/exec";
+  "https://script.google.com/macros/s/AKfycbzXau9Zj0C2Z2yPm_37Pb3k2SJb6K0lCilKQRbq2KJmQ2bDxpVPf7soXj9kTyB85P6H/exec";
 
 function TransparentFooterVideo({ src, width, height, className }: any) {
   return (

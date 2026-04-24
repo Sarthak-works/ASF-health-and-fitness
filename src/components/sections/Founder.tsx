@@ -9,15 +9,15 @@ export default function Founder() {
       name: "Suraj Shetty",
       role: "CEO Asf Dubai",
       image: "/Suraj.jpg",
-      bio: "12+ yrs. Coaching Experience | 300+ Clients Trained",
+      bio: "12+ yrs. Coaching Experience | Indian National basketball player | 300+ Clients Trained",
       objectPosition: "center 15%",
     },
     {
       name: "Akshay Sahu",
-      role: "CMO Asf Dubai",
-      image: "/Akshay.jpg",
-      bio: "10+ yrs. Coaching exp. | 200+ Clients Trained",
-      objectPosition: "center center",
+      role: " Founder / CMO Asf Dubai",
+      image: "/Akshay-suit.JPG",
+      bio: "10+ yrs. Coaching Experience | Elite Men's Physique Athlete | 200+ Clients Trained",
+      objectPosition: "",
     },
   ];
 

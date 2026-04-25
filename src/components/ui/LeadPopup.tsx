@@ -22,6 +22,9 @@ const schema = z.object({
 
 type FormData = z.infer<typeof schema>;
 
+// Google Apps Script handles both gsheet submission as well as bigin CRM submission,
+// and the URL:https://docs.google.com/spreadsheets/d/1M3zdMyf2hJ386q0jtyQJgDa8mgGFX9oIogAMDnUpsuk/edit?usp=sharing
+
 const GOOGLE_SCRIPT_URL =
   "https://script.google.com/macros/s/AKfycbzXau9Zj0C2Z2yPm_37Pb3k2SJb6K0lCilKQRbq2KJmQ2bDxpVPf7soXj9kTyB85P6H/exec";
 

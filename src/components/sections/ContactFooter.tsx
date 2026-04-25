@@ -20,7 +20,6 @@ import {
 } from "lucide-react";
 import { FaAppStoreIos, FaGooglePlay } from "react-icons/fa";
 import { TextGenerateEffect } from "@/components/ui/TextGenerateEffect";
-import Image from "next/image";
 import { useRouter } from "next/navigation";
 
 const schema = z.object({
@@ -111,6 +110,8 @@ const formFields = [
     placeholder: "+971 5X XXX XXXX",
   },
 ];
+// Google Apps Script handles both gsheet submission as well as bigin CRM submission,
+// and the URL:https://docs.google.com/spreadsheets/d/1M3zdMyf2hJ386q0jtyQJgDa8mgGFX9oIogAMDnUpsuk/edit?usp=sharing
 
 const GOOGLE_SCRIPT_URL =
   "https://script.google.com/macros/s/AKfycbzXau9Zj0C2Z2yPm_37Pb3k2SJb6K0lCilKQRbq2KJmQ2bDxpVPf7soXj9kTyB85P6H/exec";
@@ -171,20 +172,47 @@ export default function ContactFooter() {
     reset,
   } = useForm<FormData>({ resolver: zodResolver(schema) });
 
+  const INTERAKT_API_KEY =
+    "alJ0dUltUlFBR1dTNy1RVGZpY1BhSTBocEtPRl9DUHJ3VnJjc3F2WTQxTTo=";
+
   const onSubmit = async (data: FormData) => {
     setSubmitError(false);
     try {
+      // 1. Google Sheets submission
       await fetch(GOOGLE_SCRIPT_URL, {
         method: "POST",
         mode: "no-cors",
         headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ timestamp: new Date().toISOString(), ...data }),
+      });
+
+      // 2. Interakt submission
+      const cleanPhone = data.phone
+        .replace(/^\+971[- ]?/, "")
+        .replace(/[- ]/g, "");
+
+      await fetch("https://api.interakt.ai/v1/public/track/users/", {
+        method: "POST",
+        mode: "no-cors",
+        headers: {
+          Authorization: `Basic ${INTERAKT_API_KEY}`,
+          "Content-Type": "application/json",
+        },
         body: JSON.stringify({
-          timestamp: new Date().toISOString(),
-          ...data,
+          userId: data.email,
+          phoneNumber: cleanPhone,
+          countryCode: "+971",
+          traits: {
+            name: data.name,
+            email: data.email,
+            coachingType: data.coachingType,
+            budget: data.budget,
+            message: data.message,
+            leadSource: "Website Contact Form",
+          },
         }),
       });
-      // With mode: "no-cors", the response is always opaque (status 0).
-      // Reaching this line means the request was sent successfully.
+
       setSubmitted(true);
       reset();
       window.location.href = "/thank-you";

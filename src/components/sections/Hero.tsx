@@ -19,7 +19,7 @@ function ThickRibbon() {
   ];
 
   return (
-    <div className="absolute top-[85%] sm:top-[88%] md:top-[80%] left-0 w-full h-[70vh] md:h-[80vh] -translate-y-1/2 overflow-visible pointer-events-none z-0">
+    <div className="absolute inset-0 w-full h-full overflow-visible pointer-events-none z-0 pt-10">
       <svg
         viewBox="0 0 1440 400"
         className="w-full h-full preserve-3d overflow-visible"
@@ -134,7 +134,7 @@ export default function Hero() {
     <section
       ref={containerRef}
       id="hero"
-      className="relative min-h-[85vh] flex flex-col items-center justify-center overflow-hidden bg-white pt-32 pb-8 md:pb-12"
+      className="relative flex flex-col items-center overflow-hidden bg-white pt-32"
     >
       {/* Visual background accents */}
       <Spotlight
@@ -148,14 +148,6 @@ export default function Hero() {
           style={{ y: yTranslate, opacity }}
           className="relative z-30 w-full flex flex-col items-center"
         >
-          <motion.span
-            initial={{ opacity: 0, y: 15 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="text-purple font-bold tracking-[0.5em] uppercase text-[10px] md:text-xs mb-8"
-          >
-            Performance Reinvented
-          </motion.span>
-
           <div ref={headingRef} className="w-full flex justify-center">
             <motion.h1
               initial={{ opacity: 0, y: 20 }}
@@ -175,29 +167,51 @@ export default function Hero() {
             </motion.h1>
           </div>
 
-          <div className="mb-12 md:mb-16 max-w-3xl px-4 md:px-0 relative z-50">
+          <div className="mb-4 md:mb-6 max-w-3xl px-4 md:px-0 relative z-50">
             <TextGenerateEffect
-              words="Master your fitness, master your life."
+              words="Specialized Personal Training On-Demand"
               className="text-base md:text-2xl text-black font-bold tracking-tight"
             />
           </div>
 
-          <motion.a
-            href="#contact"
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.98 }}
-            className="group relative inline-flex h-16 items-center justify-center overflow-hidden rounded-full bg-purple px-8 md:px-14 font-bold text-white transition-all duration-300 hover:bg-yellow hover:text-black hover:shadow-[0_20px_60px_-10px_rgba(241,255,3,0.5)] z-50 border border-purple shadow-sm w-full max-w-[320px] md:w-auto"
+          <motion.p
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 1.1 }}
+            className="max-w-2xl px-6 text-sm md:text-base text-black leading-relaxed font-medium text-center relative z-50"
           >
-            <span className="relative z-10 text-sm tracking-[0.2em] uppercase text-center">
-              Book your free assessment
-            </span>
-            <div className="absolute inset-0 z-0 bg-gradient-to-r from-zinc-100/0 via-zinc-100/20 to-zinc-100/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000" />
-          </motion.a>
+            ASF Coaching brings expert coaches and trainers to you at home, in
+            your gym, or anywhere you prefer. We provide specialized,
+            personalized training and nutrition guidance tailored to your goals,
+            with programs designed to fit your life and your schedule.
+          </motion.p>
         </motion.div>
       </div>
 
-      {/* Custom Thick Ribbon Visual */}
-      <ThickRibbon />
+      {/* Ribbon */}
+      <div className="relative w-full h-[220px] md:h-[260px] flex-shrink-0 overflow-hidden">
+        <ThickRibbon />
+      </div>
+
+      {/* CTA button */}
+      <motion.div
+        initial={{ opacity: 0, y: 16 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.7, delay: 1.4 }}
+        className="relative z-10 flex justify-center px-4 pt-6 pb-10 md:pb-14"
+      >
+        <motion.a
+          href="#contact"
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.98 }}
+          className="group relative inline-flex h-16 items-center justify-center overflow-hidden rounded-full bg-purple px-8 md:px-14 font-bold text-white transition-all duration-300 hover:bg-yellow hover:text-black hover:shadow-[0_20px_60px_-10px_rgba(241,255,3,0.5)] border border-purple shadow-sm w-full max-w-[320px] md:w-auto"
+        >
+          <span className="relative z-10 text-sm tracking-[0.2em] uppercase text-center">
+            Book your free assessment
+          </span>
+          <div className="absolute inset-0 z-0 bg-gradient-to-r from-zinc-100/0 via-zinc-100/20 to-zinc-100/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000" />
+        </motion.a>
+      </motion.div>
 
       {/* Additional decorative blurs for depth */}
       <div className="absolute top-1/2 left-0 w-96 h-96 bg-purple-500/5 rounded-full blur-[120px] -z-10" />

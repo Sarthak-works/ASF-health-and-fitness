@@ -60,11 +60,6 @@ const teamCards = [
     role: "Coach",
     src: "/harsha.jpeg",
   },
-  {
-    title: "swanil",
-    role: "Coach",
-    src: "/swanil.jpeg",
-  },
 ];
 
 // Custom Card UI to be used by FocusCards if we wanted a custom render,

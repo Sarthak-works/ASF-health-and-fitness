@@ -20,9 +20,9 @@ const montserrat = Montserrat({
 });
 
 export const metadata: Metadata = {
-  title: "ASF Health & Fitness | Performance for Entrepreneurs",
+  title: "ASF Coaching | Personal Training On-Demand",
   description:
-    "Built for entrepreneurs and business leaders to sustain success through health and fitness.",
+    "Personal Training On-Demand. Our services- Personal Training, C-Suite Coaching, VIP Training, Semi Private / Couple Training, Mental Health, Yoga, Nutrition.",
   icons: {
     icon: "/100X100-ASF.png",
   },

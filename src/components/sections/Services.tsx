@@ -166,12 +166,7 @@ const services = [
     description:
       "Explore crawling, rolling, and ground patterns that build awareness.",
   },
-  {
-    title: "Martial Arts",
-    icon: <Shield size={32} />,
-    description:
-      "Develop timing, reflexes, and agility through martial arts movement.",
-  },
+
   {
     title: "Object Manipulation",
     icon: <Box size={32} />,

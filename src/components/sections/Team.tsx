@@ -53,24 +53,18 @@ const nutritionists: TrainerCard[] = [
 
 const flowTeam: TrainerCard[] = [
   {
-    title: "Flow Coach Name",
-    role: "Yoga & Mobility Expert",
-    src: "/flow-1.webp",
-  },
-  {
-    title: "Flow Coach Name",
-    role: "Breathwork Specialist",
-    src: "/flow-2.webp",
+    title: "Flow coaches",
+    role: "Yoga & Mobility Experts",
+    src: "/flow team.jpeg",
   },
 ];
 
 const mentalWellbeingTeam: TrainerCard[] = [
   {
-    title: "Therapist Name",
+    title: "",
     role: "Sports Psychologist",
-    src: "/mental-1.webp",
+    src: "/mental-wellbeingteam.jpeg",
   },
-  { title: "Coach Name", role: "Mindset Coach", src: "/mental-2.webp" },
 ];
 
 const CARD_W = 300;

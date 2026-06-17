@@ -7,14 +7,18 @@
   --background-start-rgb: 255, 255, 255;
   --background-end-rgb: 255, 255, 255;
   --primary: #552583;
-  --accent: #F1FF03;
+  --accent: #f1ff03;
 }
 
-h1, h2, h3 {
+h1,
+h2,
+h3 {
   font-family: var(--font-playfair), serif;
 }
 
-h4, h5, h6 {
+h4,
+h5,
+h6 {
   font-family: var(--font-montserrat), sans-serif;
   @apply font-bold;
 }
@@ -49,10 +53,18 @@ html.lenis {
 }
 
 /* Custom Utilities */
-.text-purple { color: #552583; }
-.bg-purple { background-color: #552583; }
-.text-yellow { color: #F1FF03; }
-.bg-yellow { background-color: #F1FF03; }
+.text-purple {
+  color: #552583;
+}
+.bg-purple {
+  background-color: #552583;
+}
+.text-yellow {
+  color: #f1ff03;
+}
+.bg-yellow {
+  background-color: #f1ff03;
+}
 
 .section-label {
   @apply text-purple font-medium uppercase tracking-widest text-sm mb-4;
@@ -66,4 +78,7 @@ html.lenis {
 .headline-medium {
   font-family: var(--font-playfair), serif;
   @apply text-3xl md:text-5xl font-bold mb-6;
+}
+.overflow-x-auto::-webkit-scrollbar {
+  display: none;
 }

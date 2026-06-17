@@ -187,12 +187,6 @@ export default function Hero() {
           </motion.p>
         </motion.div>
       </div>
-
-      {/* Ribbon */}
-      <div className="relative w-full h-[220px] md:h-[260px] flex-shrink-0 overflow-hidden">
-        <ThickRibbon />
-      </div>
-
       {/* CTA button */}
       <motion.div
         initial={{ opacity: 0, y: 16 }}
@@ -204,7 +198,7 @@ export default function Hero() {
           href="#contact"
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.98 }}
-          className="group relative inline-flex h-16 items-center justify-center overflow-hidden rounded-full bg-purple px-8 md:px-14 font-bold text-white transition-all duration-300 hover:bg-yellow hover:text-black hover:shadow-[0_20px_60px_-10px_rgba(241,255,3,0.5)] border border-purple shadow-sm w-full max-w-[320px] md:w-auto"
+          className=" mt-10 group relative inline-flex h-16 items-center justify-center overflow-hidden rounded-full bg-purple px-8 md:px-14 font-bold text-white transition-all duration-300 hover:bg-yellow hover:text-black hover:shadow-[0_20px_60px_-10px_rgba(241,255,3,0.5)] border border-purple shadow-sm w-full max-w-[320px] md:w-auto"
         >
           <span className="relative z-10 text-sm tracking-[0.2em] uppercase text-center">
             Book your free assessment
@@ -216,6 +210,10 @@ export default function Hero() {
       {/* Additional decorative blurs for depth */}
       <div className="absolute top-1/2 left-0 w-96 h-96 bg-purple-500/5 rounded-full blur-[120px] -z-10" />
       <div className="absolute top-1/2 right-0 w-96 h-96 bg-accent/5 rounded-full blur-[120px] -z-10" />
+      {/* Ribbon */}
+      <div className="relative w-full h-[220px] md:h-[260px] flex-shrink-0 overflow-hidden">
+        <ThickRibbon />
+      </div>
     </section>
   );
 }

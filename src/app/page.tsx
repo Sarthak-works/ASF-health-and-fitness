@@ -2,6 +2,8 @@ import dynamic from "next/dynamic";
 import Navbar from "@/components/sections/Navbar";
 import Hero from "@/components/sections/Hero";
 import MapSection from "@/components/sections/Map";
+import GoogleReviews from "@/components/sections/GoogleReviews";
+import InstagramGrid from "@/components/sections/InstagramGrid";
 
 // Below-the-fold sections
 const About = dynamic(() => import("@/components/sections/About"));
@@ -29,13 +31,16 @@ export default function Home() {
       <About />
       <Transformations />
       <Testimonials />
+      <GoogleReviews />
       <Founder />
       <Team />
       <Services />
+      <InstagramGrid />
       <Stats />
       <FAQ />
       {/* <Blogs /> */}
       <MapSection />
+
       <ContactFooter />
     </main>
   );

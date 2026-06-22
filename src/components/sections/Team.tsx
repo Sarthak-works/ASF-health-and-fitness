@@ -17,30 +17,24 @@ interface TrainerCard {
 
 const expertTrainers: TrainerCard[] = [
   {
-    title: "Suraj Shetty",
-    role: "Transformation Specialist",
-    src: "/coach-suraj.webp",
-  },
-  {
-    title: "Akshay Sahu",
-    role: "Founder & Head Coach",
-    src: "/coach-akshay.webp",
-  },
-  { title: "Hoyam Ahmed", role: "Fitness Coach", src: "/coach-hoyam.webp" },
-  {
     title: "Karthik Jadhav",
     role: "Performance Coach",
     src: "/coach-karthik.webp",
   },
+
+  { title: "Dileef Thahir", role: "Elite Trainer", src: "/coach-dileef.webp" },
+  { title: "Sonali Kole", role: "Coach", src: "/sonali-kole.jpeg" },
+  { title: "Aniket", role: "Coach", src: "/coach-aniket.webp" },
+  { title: "Sujal", role: "Coach", src: "/coach-sujal.webp" },
+];
+const seniorCoaches: TrainerCard[] = [
+  { title: "Hoyam Ahmed", role: "Fitness Coach", src: "/coach-hoyam.webp" },
+
   {
     title: "Mohammed Hasnain",
     role: "Strength Coach",
     src: "/coach-hasnain.webp",
   },
-  { title: "Dileef Thahir", role: "Elite Trainer", src: "/coach-dileef.webp" },
-  { title: "Sonali Kole", role: "Coach", src: "/sonali-kole.jpeg" },
-  { title: "Aniket", role: "Coach", src: "/coach-aniket.webp" },
-  { title: "Sujal", role: "Coach", src: "/coach-sujal.webp" },
 ];
 
 const nutritionists: TrainerCard[] = [
@@ -229,17 +223,24 @@ export default function OurTeam() {
         <div className="mt-4 mx-auto w-24 h-1.5 bg-purple-600 rounded-full" />
       </div>
 
+      {/* 1. Senior Coaches — white bg */}
+      <Subsection
+        title="Our Senior Coaches"
+        subtitle="Highly qualified, experienced fitness specialists dedicated to crafting tailored programs that deliver lasting results."
+        cards={seniorCoaches}
+        accent="white"
+      />
       {/* 1. Expert Trainers — white bg */}
       <Subsection
-        title="Our Expert Trainers"
-        subtitle="Our certified trainers bring years of experience and a passion for helping you achieve your goals."
+        title="Our Expert Coaches"
+        subtitle="Certified technical specialists focused on elevating your form, maximizing performance, and unlocking your true physical potential."
         cards={expertTrainers}
         accent="white"
       />
 
       {/* 2. Nutritionists — gray bg to distinguish */}
       <Subsection
-        title="Our Nutritionists"
+        title="Our Nutritionist"
         subtitle="Science-backed nutrition experts who craft personalised plans to fuel your performance and transform your health from the inside out."
         cards={nutritionists}
         accent="gray"

@@ -4,6 +4,7 @@ import Hero from "@/components/sections/Hero";
 import MapSection from "@/components/sections/Map";
 import GoogleReviews from "@/components/sections/GoogleReviews";
 import InstagramGrid from "@/components/sections/InstagramGrid";
+import Accountability from "@/components/sections/Accountability";
 
 // Below-the-fold sections
 const About = dynamic(() => import("@/components/sections/About"));
@@ -36,6 +37,7 @@ export default function Home() {
       <Team />
       <Services />
       <InstagramGrid />
+      <Accountability />
       <Stats />
       <FAQ />
       {/* <Blogs /> */}

@@ -10,6 +10,7 @@ const SCREENSHOTS = [
   "/dailyacc3.jpg",
   "/dailyacc4.jpg",
   "/dailyacc5.jpg",
+  "/dailyacc6.jpg",
 ];
 
 const pillars = [

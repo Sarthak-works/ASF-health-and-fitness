@@ -5,6 +5,7 @@ import MapSection from "@/components/sections/Map";
 import GoogleReviews from "@/components/sections/GoogleReviews";
 import InstagramGrid from "@/components/sections/InstagramGrid";
 import Accountability from "@/components/sections/Accountability";
+import ServicesTest from "@/components/sections/ServicesTest";
 
 // Below-the-fold sections
 const About = dynamic(() => import("@/components/sections/About"));
@@ -35,6 +36,8 @@ export default function Home() {
       <GoogleReviews />
       <Founder />
       <Team />
+      {/* <ServicesTest /> */}
+      {/* removed services on 29/6/26 after the call to improve the section  */}
       <Services />
       <InstagramGrid />
       <Accountability />

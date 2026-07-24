@@ -1,10 +1,22 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import Script from "next/script";
 
 const META_PIXEL_ID = "1496046202091964";
 
 export default function MetaPixel() {
+  const [consented, setConsented] = useState(false);
+
+  useEffect(() => {
+    const handleConsent = () => setConsented(true);
+    window.addEventListener("consent:meta-pixel", handleConsent);
+    return () =>
+      window.removeEventListener("consent:meta-pixel", handleConsent);
+  }, []);
+
+  if (!consented) return null;
+
   return (
     <>
       <Script

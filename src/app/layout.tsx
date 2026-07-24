@@ -7,6 +7,7 @@ import WhatsAppWidget from "@/components/ui/WhatsAppWidget";
 import GoogleAnalytics from "@/components/GoogleAnalytics";
 import MetaPixel from "@/components/MetaPixel";
 import { ThemeProvider } from "next-themes";
+import CookieConsentBanner from "@/components/CookieConsent";
 const playfair = Playfair_Display({
   subsets: ["latin"],
   variable: "--font-playfair",
@@ -36,8 +37,6 @@ export default function RootLayout({
   return (
     <html lang="en" className="scroll-smooth">
       <head>
-        <GoogleAnalytics />
-        <MetaPixel />
         <meta
           name="facebook-domain-verification"
           content="h61h8jhyyajfsrb3b6zyqnjw6rvvra"
@@ -53,6 +52,9 @@ export default function RootLayout({
 
           <LeadPopup />
           <WhatsAppWidget />
+          <CookieConsentBanner />
+          <GoogleAnalytics />
+          <MetaPixel />
         </LenisProvider>
       </body>
     </html>

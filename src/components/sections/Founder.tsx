@@ -7,14 +7,14 @@ export default function Founder() {
   const founders = [
     {
       name: "Suraj Shetty",
-      role: "CEO Asf Dubai",
+      role: "CEO Asf Coaching",
       image: "/Suraj.jpg",
       bio: "12+ yrs. Coaching Experience | Indian National basketball player | 300+ Clients Trained",
       objectPosition: "center 15%",
     },
     {
       name: "Akshay Sahu",
-      role: " Founder / CMO Asf Dubai",
+      role: " Founder / CMO Asf Coaching",
       image: "/Akshay-suit.JPG",
       bio: "10+ yrs. Coaching Experience | Elite Men's Physique Athlete | 200+ Clients Trained",
       objectPosition: "",

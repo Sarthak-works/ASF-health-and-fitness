@@ -1,11 +1,20 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import Script from "next/script";
 
 const GA_MEASUREMENT_ID = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID;
 
 export default function GoogleAnalytics() {
-  if (!GA_MEASUREMENT_ID) return null;
+  const [consented, setConsented] = useState(false);
+
+  useEffect(() => {
+    const handleConsent = () => setConsented(true);
+    window.addEventListener("consent:analytics", handleConsent);
+    return () => window.removeEventListener("consent:analytics", handleConsent);
+  }, []);
+
+  if (!GA_MEASUREMENT_ID || !consented) return null;
 
   return (
     <>

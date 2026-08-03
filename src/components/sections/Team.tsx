@@ -22,7 +22,8 @@ const expertTrainers: TrainerCard[] = [
     src: "/coach-karthik.webp",
   },
   { title: "Dileef Thahir", role: "Elite Trainer", src: "/coach-dileef.webp" },
-  { title: "Sonali Kole", role: "Coach", src: "/sonali-kole.jpeg" },
+  // Removed after instructed on whatsapp on 3/8/26
+  //  { title: "Sonali Kole", role: "Coach", src: "/sonali-kole.jpeg" },
   { title: "Aniket", role: "Coach", src: "/coach-aniket.webp" },
   { title: "Sujal", role: "Coach", src: "/coach-sujal.webp" },
 ];

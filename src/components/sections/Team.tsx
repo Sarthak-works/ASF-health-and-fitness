@@ -26,7 +26,6 @@ const expertTrainers: TrainerCard[] = [
   //  { title: "Sonali Kole", role: "Coach", src: "/sonali-kole.jpeg" },
   { title: "Aniket", role: "Coach", src: "/coach-aniket.webp" },
   { title: "Sujal", role: "Coach", src: "/coach-sujal.webp" },
-  { title: "Rakesh", role: "Coach", src: "/Rakesh.jpg" },
 ];
 
 const seniorCoaches: TrainerCard[] = [
@@ -36,6 +35,9 @@ const seniorCoaches: TrainerCard[] = [
     role: "Strength Coach",
     src: "/coach-hasnain.webp",
   },
+];
+const seniorCorporateCoaches: TrainerCard[] = [
+  { title: "Rakesh", role: "Corporate Coach", src: "/Rakesh.jpg" },
 ];
 
 const nutritionists: TrainerCard[] = [
@@ -314,6 +316,13 @@ export default function OurTeam() {
         title="Our Senior Coaches"
         subtitle="Highly qualified, experienced fitness specialists dedicated to crafting tailored programs that deliver lasting results."
         cards={seniorCoaches}
+        accent="white"
+        layout="scroll-fit"
+      />
+      <Subsection
+        title="Our Senior Corporate Coach"
+        subtitle="Corporate wellness specialists dedicated to optimizing workplace health, boosting energy, and building sustainable habits for busy professionals."
+        cards={seniorCorporateCoaches}
         accent="white"
         layout="scroll-fit"
       />

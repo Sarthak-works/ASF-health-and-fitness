@@ -26,6 +26,7 @@ const expertTrainers: TrainerCard[] = [
   //  { title: "Sonali Kole", role: "Coach", src: "/sonali-kole.jpeg" },
   { title: "Aniket", role: "Coach", src: "/coach-aniket.webp" },
   { title: "Sujal", role: "Coach", src: "/coach-sujal.webp" },
+  { title: "Rakesh", role: "Coach", src: "/Rakesh.jpg" },
 ];
 
 const seniorCoaches: TrainerCard[] = [

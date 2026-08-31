@@ -106,13 +106,10 @@ function arcTransform(index: number, total: number) {
 
   return {
     t,
-    /* outer cards sit lower, tracing the rainbow curve; the -34 lift
-       centres the fan in its box instead of hanging it off the baseline */
-    translateY: Math.pow(distance, 1.5) * 68 - 34,
-    /* cards turn to face the centre of the fan */
+    /* The row is level — cards share one baseline rather than tracing a
+       curve. Depth comes from turning each card to face the centre and
+       letting the outer ones recede, not from lifting them off the line. */
     rotateY: -t * 34,
-    rotateZ: t * 9,
-    /* and recede slightly as they go */
     translateZ: -distance * 90,
     scale: 1 - distance * 0.08,
     /* centre cards render in front */
@@ -235,11 +232,12 @@ function CardArc() {
   return (
     /* The row is scaled down on small screens, but a CSS scale does not
        shrink the layout box — so the fan is absolutely positioned inside a
-       wrapper whose height matches the *scaled* result. Otherwise the
-       leftover height shows up as a large empty gap above the cards. */
+       wrapper whose height matches the *scaled* result (card height × the
+       scale at that breakpoint). Otherwise the leftover height shows up as
+       a large empty gap above the cards. */
     <div
       aria-hidden="true"
-      className="relative mt-4 h-[120px] w-full sm:h-[155px] md:mt-8 md:h-[200px] lg:h-[222px]"
+      className="relative mt-4 h-[105px] w-full sm:h-[128px] md:mt-8 md:h-[162px] lg:h-[180px]"
       style={{ perspective: "1600px" }}
     >
       <div
@@ -273,7 +271,7 @@ function CardArc() {
             >
               <div
                 style={{
-                  transform: `translateY(${a.translateY}px) rotateY(${a.rotateY}deg) rotateZ(${a.rotateZ}deg) translateZ(${a.translateZ}px) scale(${a.scale})`,
+                  transform: `rotateY(${a.rotateY}deg) translateZ(${a.translateZ}px) scale(${a.scale})`,
                 }}
                 className="relative h-[178px] w-[158px] overflow-hidden rounded-2xl border border-white/60 bg-white shadow-[0_24px_50px_-16px_rgba(23,9,31,0.6)]"
               >
@@ -330,13 +328,15 @@ export default function Hero() {
   return (
     <section
       id="hero"
-      className="relative isolate overflow-hidden bg-[#17091f] px-2 pb-2 sm:px-3 sm:pb-3"
+      className="relative isolate overflow-hidden bg-[#17091f]"
     >
       {/* ---- Sky --------------------------------------------------- */}
       {/* The gradient is the container's own background: painting it on a
           child would sit behind the wrapper and never show. */}
       <div
-        className="relative overflow-hidden rounded-b-[2rem] sm:rounded-[2rem]"
+        /* top corners only — the panel runs flush to the left, right and
+           bottom edges of the viewport */
+        className="relative overflow-hidden rounded-t-[2rem]"
         style={{
           background:
             "linear-gradient(180deg, #1B0A2E 0%, #3B1668 26%, #552583 52%, #7B2CBF 78%, #9D4EDD 100%)",

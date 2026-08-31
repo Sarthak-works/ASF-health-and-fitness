@@ -273,18 +273,26 @@ function CardArc() {
                 style={{
                   transform: `rotateY(${a.rotateY}deg) translateZ(${a.translateZ}px) scale(${a.scale})`,
                 }}
-                className="relative h-[178px] w-[158px] overflow-hidden rounded-2xl border border-white/60 bg-white shadow-[0_24px_50px_-16px_rgba(23,9,31,0.6)]"
+                /* Clipping window only. The border, fill and radius live on
+                   the sliding card below so the whole card travels rather
+                   than just its contents. The shadow has to stay here — a
+                   box-shadow on the moving card would be clipped off by
+                   this overflow. */
+                className="relative h-[178px] w-[158px] overflow-hidden rounded-2xl shadow-[0_24px_50px_-16px_rgba(23,9,31,0.6)]"
               >
                 {/* `initial={false}` so the first paint is not a slide-in —
-                    the deck's entrance is handled by the wrapper above. */}
+                    the deck's entrance is handled by the wrapper above.
+                    Exactly 100%, not more: the outgoing card's right edge
+                    then stays flush against the incoming card's left edge
+                    for the whole move, so no gap opens up between them. */}
                 <AnimatePresence initial={false}>
                   <motion.div
                     key={cardIndex}
-                    initial={{ x: "108%" }}
+                    initial={{ x: "100%" }}
                     animate={{ x: "0%" }}
-                    exit={{ x: "-108%" }}
+                    exit={{ x: "-100%" }}
                     transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
-                    className="absolute inset-0"
+                    className="absolute inset-0 overflow-hidden rounded-2xl border border-white/60 bg-white"
                   >
                     <CardFace card={card} />
                   </motion.div>

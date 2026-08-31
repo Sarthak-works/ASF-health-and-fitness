@@ -61,12 +61,23 @@ const DefaultLoader = () => (
   </div>
 );
 
+const DefaultFallback = () => (
+  <div className="absolute inset-0 flex items-center justify-center bg-muted/30 px-6">
+    <p className="max-w-sm text-center text-sm text-muted-foreground">
+      The interactive map could not be loaded on this device. All of our
+      locations are listed below.
+    </p>
+  </div>
+);
+
 function Map({ children, styles, ...props }: MapProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<MapLibreGL.Map | null>(null);
   const [isMounted, setIsMounted] = useState(false);
   const [isLoaded, setIsLoaded] = useState(false);
   const [isStyleLoaded, setIsStyleLoaded] = useState(false);
+  const [shouldInit, setShouldInit] = useState(false);
+  const [hasError, setHasError] = useState(false);
   const { resolvedTheme } = useTheme();
 
   const mapStyles = useMemo(
@@ -81,36 +92,82 @@ function Map({ children, styles, ...props }: MapProps) {
     setIsMounted(true);
   }, []);
 
+  /* Hold off until the map is near the viewport. A WebGL context is a scarce
+     per-page resource and this section sits far down the page, so claiming
+     one on every page load — for a map most visitors never scroll to — is
+     both wasteful and what pushes the page towards the browser's context
+     limit. */
   useEffect(() => {
     if (!isMounted || !containerRef.current) return;
+
+    if (typeof IntersectionObserver === "undefined") {
+      setShouldInit(true);
+      return;
+    }
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries.some((entry) => entry.isIntersecting)) {
+          setShouldInit(true);
+          observer.disconnect();
+        }
+      },
+      { rootMargin: "300px" },
+    );
+
+    observer.observe(containerRef.current);
+    return () => observer.disconnect();
+  }, [isMounted]);
+
+  useEffect(() => {
+    if (!shouldInit || !containerRef.current) return;
 
     const mapStyle =
       resolvedTheme === "dark" ? mapStyles.dark : mapStyles.light;
 
-    const mapInstance = new MapLibreGL.Map({
-      container: containerRef.current,
-      style: mapStyle,
-      renderWorldCopies: false,
-      attributionControl: {
-        compact: true,
-      },
-      ...props,
-    });
+    /* WebGL can be unavailable for reasons that have nothing to do with this
+       page: a blocklisted GPU, hardware acceleration switched off, or the
+       browser declining to hand out another context. Unguarded, that throw
+       escapes the effect and takes down the whole page, so degrade to the
+       location list instead. */
+    let mapInstance: MapLibreGL.Map;
+    try {
+      mapInstance = new MapLibreGL.Map({
+        container: containerRef.current,
+        style: mapStyle,
+        renderWorldCopies: false,
+        attributionControl: {
+          compact: true,
+        },
+        ...props,
+      });
+    } catch (err) {
+      console.error("Map failed to initialise:", err);
+      setHasError(true);
+      return;
+    }
 
     const styleDataHandler = () => setIsStyleLoaded(true);
     const loadHandler = () => setIsLoaded(true);
+    /* MapLibre reports a lost context asynchronously rather than throwing. */
+    const errorHandler = (event: { error?: { message?: string } }) => {
+      console.error("Map error:", event?.error ?? event);
+      setHasError(true);
+    };
 
     mapInstance.on("load", loadHandler);
     mapInstance.on("styledata", styleDataHandler);
+    mapInstance.on("webglcontextlost", errorHandler);
     mapRef.current = mapInstance;
 
     return () => {
       mapInstance.off("load", loadHandler);
       mapInstance.off("styledata", styleDataHandler);
+      mapInstance.off("webglcontextlost", errorHandler);
       mapInstance.remove();
       mapRef.current = null;
     };
-  }, [isMounted]);
+  }, [shouldInit]);
 
   useEffect(() => {
     if (mapRef.current) {
@@ -122,7 +179,7 @@ function Map({ children, styles, ...props }: MapProps) {
     }
   }, [resolvedTheme, mapStyles]);
 
-  const isLoading = !isMounted || !isLoaded || !isStyleLoaded;
+  const isLoading = !hasError && (!isMounted || !isLoaded || !isStyleLoaded);
 
   return (
     <MapContext.Provider
@@ -133,8 +190,10 @@ function Map({ children, styles, ...props }: MapProps) {
     >
       <div ref={containerRef} className="relative w-full h-full">
         {isLoading && <DefaultLoader />}
-        {/* guard against hydration error */}
-        {isMounted && children}
+        {hasError && <DefaultFallback />}
+        {/* guard against hydration error; children mount markers and
+            controls onto the map, so they stay out when there is no map */}
+        {isMounted && !hasError && children}
       </div>
     </MapContext.Provider>
   );

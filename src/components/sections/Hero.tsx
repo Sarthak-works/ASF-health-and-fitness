@@ -1,6 +1,7 @@
 "use client";
 
-import { motion, useReducedMotion } from "framer-motion";
+import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
+import { useEffect, useState } from "react";
 import Image from "next/image";
 import { ArrowUpRight } from "lucide-react";
 
@@ -69,7 +70,32 @@ const HERO_CARDS: HeroCard[] = [
     alt: "ASF client Satish training with a coach",
     caption: "Train anywhere you like",
   },
+  {
+    kind: "photo",
+    src: "/testimonial-video-posters/Chronic back pain 16-5_frame-001.jpg",
+    alt: "ASF client describing relief from chronic back pain",
+    caption: "Pain-free movement",
+  },
+  {
+    kind: "stat",
+    label: "Certified coaches",
+    value: "20+",
+    sub: "Across strength, rehab and nutrition",
+  },
+  {
+    kind: "photo",
+    src: "/testimonial-video-posters/Mathangi.jpg",
+    alt: "ASF client Mathangi sharing her results",
+    caption: "Coaching that fits your life",
+  },
 ];
+
+/* Visible positions on the arc. The pool above is deliberately longer, so
+   every rotation brings a slide that is not already on screen. */
+const SLOTS = 8;
+
+/* Dwell time per slide, in ms. */
+const ROTATE_MS = 3200;
 
 /* Arc geometry — every transform below is a pure function of the card's
    normalised position `t` in [-1, 1], so the fan stays symmetrical
@@ -171,6 +197,41 @@ function CardFace({ card }: { card: HeroCard }) {
 function CardArc() {
   const reduceMotion = useReducedMotion();
 
+  /* The arc positions themselves never move — animating eight cards along a
+     3D curve is expensive and reads as noise. Instead the slides advance
+     through fixed slots: on each tick every slot shows the next card in the
+     pool, entering from the right and leaving to the left, which is the
+     direction content would travel if the whole deck were rotating. */
+  const [tick, setTick] = useState(0);
+
+  useEffect(() => {
+    if (reduceMotion) return;
+
+    /* Pause while the tab is hidden. Exit animations are driven by rAF,
+       which does not run in a background tab, so a ticking interval would
+       queue up slides that can never finish leaving — the outgoing nodes
+       accumulate in the DOM for as long as the tab stays hidden. */
+    let id: ReturnType<typeof setInterval> | undefined;
+
+    const stop = () => {
+      if (id) clearInterval(id);
+      id = undefined;
+    };
+    const start = () => {
+      stop();
+      id = setInterval(() => setTick((t) => t + 1), ROTATE_MS);
+    };
+    const onVisibilityChange = () => (document.hidden ? stop() : start());
+
+    if (!document.hidden) start();
+    document.addEventListener("visibilitychange", onVisibilityChange);
+
+    return () => {
+      stop();
+      document.removeEventListener("visibilitychange", onVisibilityChange);
+    };
+  }, [reduceMotion]);
+
   return (
     /* The row is scaled down on small screens, but a CSS scale does not
        shrink the layout box — so the fan is absolutely positioned inside a
@@ -185,8 +246,10 @@ function CardArc() {
         className="absolute inset-x-0 bottom-0 flex origin-bottom items-end justify-center scale-[0.58] sm:scale-[0.7] md:scale-90 lg:scale-100"
         style={{ transformStyle: "preserve-3d" }}
       >
-        {HERO_CARDS.map((card, i) => {
-          const a = arcTransform(i, HERO_CARDS.length);
+        {Array.from({ length: SLOTS }).map((_, i) => {
+          const a = arcTransform(i, SLOTS);
+          const cardIndex = (i + tick) % HERO_CARDS.length;
+          const card = HERO_CARDS[cardIndex];
 
           return (
             /* Two elements on purpose: framer-motion animates `transform`
@@ -205,16 +268,29 @@ function CardArc() {
               /* the outermost pair would be clipped mid-content on phones,
                  so they only join the fan from `sm` up */
               className={`-mx-4 shrink-0 ${
-                i === 0 || i === HERO_CARDS.length - 1 ? "hidden sm:block" : ""
+                i === 0 || i === SLOTS - 1 ? "hidden sm:block" : ""
               }`}
             >
               <div
                 style={{
                   transform: `translateY(${a.translateY}px) rotateY(${a.rotateY}deg) rotateZ(${a.rotateZ}deg) translateZ(${a.translateZ}px) scale(${a.scale})`,
                 }}
-                className="h-[178px] w-[158px] overflow-hidden rounded-2xl border border-white/60 bg-white shadow-[0_24px_50px_-16px_rgba(23,9,31,0.6)]"
+                className="relative h-[178px] w-[158px] overflow-hidden rounded-2xl border border-white/60 bg-white shadow-[0_24px_50px_-16px_rgba(23,9,31,0.6)]"
               >
-                <CardFace card={card} />
+                {/* `initial={false}` so the first paint is not a slide-in —
+                    the deck's entrance is handled by the wrapper above. */}
+                <AnimatePresence initial={false}>
+                  <motion.div
+                    key={cardIndex}
+                    initial={{ x: "108%" }}
+                    animate={{ x: "0%" }}
+                    exit={{ x: "-108%" }}
+                    transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
+                    className="absolute inset-0"
+                  >
+                    <CardFace card={card} />
+                  </motion.div>
+                </AnimatePresence>
               </div>
             </motion.div>
           );

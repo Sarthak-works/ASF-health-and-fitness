@@ -28,6 +28,7 @@ const testimonials = [
     id: 5,
     name: "Client Result",
     video: "/testimonial videos/Zenobia 24-5.mp4",
+    poster: "/testimonial-video-posters/Zenobia 24-5_frame-001.jpg",
   },
   {
     id: 4,

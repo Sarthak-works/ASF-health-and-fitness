@@ -1,7 +1,7 @@
 "use client";
 
-import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
-import { useEffect, useState } from "react";
+import { motion, useAnimationControls, useReducedMotion } from "framer-motion";
+import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { ArrowUpRight } from "lucide-react";
 
@@ -95,12 +95,13 @@ const HERO_CARDS: HeroCard[] = [
   },
 ];
 
-/* Visible positions in the strip. The pool above is deliberately longer, so
-   every rotation brings on a slide that is not already on screen. */
-const SLOTS = 8;
+/* Cards kept in the DOM. Enough to fill the widest viewport plus a couple
+   spilling past each edge, so there is always something to slide in. */
+const RENDERED = 10;
 
-/* Dwell time per slide, in ms. */
+/* Dwell time between steps, in ms, and how long one step takes. */
 const ROTATE_MS = 3200;
+const STEP_MS = 850;
 
 function CardFace({ card }: { card: HeroCard }) {
   switch (card.kind) {
@@ -176,31 +177,71 @@ function CardFace({ card }: { card: HeroCard }) {
   }
 }
 
+type StripItem = { id: number; cardIndex: number };
+
 function CardStrip() {
   const reduceMotion = useReducedMotion();
+  const rowRef = useRef<HTMLDivElement>(null);
+  const controls = useAnimationControls();
 
-  /* The slots never move — the slides advance through them: on each tick
-     every slot shows the next card in the pool, entering from the right and
-     leaving to the left, the direction content would travel if the whole
-     strip were scrolling. */
-  const [tick, setTick] = useState(0);
+  /* The whole row travels as one piece. Swapping each card in place — which
+     is what this did before — changes all of them at the same instant and
+     reads as a flicker rather than a carousel. Here the strip slides left by
+     exactly one card, then the card that has gone off the left edge is
+     recycled to the tail and the row snaps back to zero. Because the row is
+     already one card further along at that point, the snap is invisible. */
+  const [items, setItems] = useState<StripItem[]>(() =>
+    Array.from({ length: RENDERED }, (_, i) => ({
+      id: i,
+      cardIndex: i % HERO_CARDS.length,
+    })),
+  );
+
+  const nextId = useRef(RENDERED);
+  const nextCard = useRef(RENDERED % HERO_CARDS.length);
 
   useEffect(() => {
     if (reduceMotion) return;
 
-    /* Pause while the tab is hidden. Exit animations are driven by rAF,
-       which does not run in a background tab, so a ticking interval would
-       queue up slides that can never finish leaving — the outgoing nodes
-       accumulate in the DOM for as long as the tab stays hidden. */
+    let cancelled = false;
     let id: ReturnType<typeof setInterval> | undefined;
 
+    const step = async () => {
+      const row = rowRef.current;
+      if (!row || row.children.length < 2) return;
+
+      /* Measure rather than hard-code: card width is set per breakpoint, so
+         the distance to advance changes with the viewport. The gap between
+         the first two children is exactly that distance. */
+      const first = row.children[0] as HTMLElement;
+      const second = row.children[1] as HTMLElement;
+      const pitch = second.offsetLeft - first.offsetLeft;
+      if (!pitch) return;
+
+      await controls.start({
+        x: -pitch,
+        transition: { duration: STEP_MS / 1000, ease: [0.65, 0, 0.35, 1] },
+      });
+      if (cancelled) return;
+
+      setItems((prev) => [
+        ...prev.slice(1),
+        { id: nextId.current++, cardIndex: nextCard.current },
+      ]);
+      nextCard.current = (nextCard.current + 1) % HERO_CARDS.length;
+      controls.set({ x: 0 });
+    };
+
+    /* Pause while the tab is hidden: the step animation is driven by rAF,
+       which does not run in a background tab, so the interval would stack up
+       steps that never resolve. */
     const stop = () => {
       if (id) clearInterval(id);
       id = undefined;
     };
     const start = () => {
       stop();
-      id = setInterval(() => setTick((t) => t + 1), ROTATE_MS);
+      id = setInterval(step, ROTATE_MS);
     };
     const onVisibilityChange = () => (document.hidden ? stop() : start());
 
@@ -208,61 +249,39 @@ function CardStrip() {
     document.addEventListener("visibilitychange", onVisibilityChange);
 
     return () => {
+      cancelled = true;
       stop();
       document.removeEventListener("visibilitychange", onVisibilityChange);
     };
-  }, [reduceMotion]);
+  }, [reduceMotion, controls]);
 
   return (
     /* Flat, level row that runs wider than the viewport and is clipped at
        both edges by the panel, so the outermost cards read as continuing
        past the frame. Card size is set per breakpoint rather than by a CSS
        scale, so the layout box always matches what is drawn. */
-    <div
+    <motion.div
       aria-hidden="true"
-      className="mt-10 flex w-full shrink-0 justify-center gap-2 md:mt-14 md:gap-3"
+      initial={reduceMotion ? false : { opacity: 0, y: 60 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.8, delay: reduceMotion ? 0 : 0.7 }}
+      className="mt-12 w-full md:mt-16"
     >
-      {Array.from({ length: SLOTS }).map((_, i) => {
-        const cardIndex = (i + tick) % HERO_CARDS.length;
-        const card = HERO_CARDS[cardIndex];
-
-        return (
-          <motion.div
-            key={i}
-            initial={reduceMotion ? false : { opacity: 0, y: 60 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{
-              duration: 0.7,
-              delay: reduceMotion ? 0 : 0.7 + i * 0.06,
-              ease: [0.22, 1, 0.36, 1],
-            }}
-            /* Clipping window only. The border, fill and radius live on the
-               sliding card below so the whole card travels rather than just
-               its contents. The shadow has to stay here — a box-shadow on
-               the moving card would be clipped off by this overflow. */
-            className="relative h-[150px] w-[124px] shrink-0 overflow-hidden rounded-2xl shadow-[0_24px_50px_-16px_rgba(23,9,31,0.6)] sm:h-[170px] sm:w-[150px] md:h-[190px] md:w-[178px] lg:h-[200px] lg:w-[196px]"
+      <motion.div
+        ref={rowRef}
+        animate={controls}
+        className="flex justify-center gap-2 md:gap-3"
+      >
+        {items.map((item) => (
+          <div
+            key={item.id}
+            className="h-[170px] w-[150px] shrink-0 overflow-hidden rounded-2xl border border-white/60 bg-white shadow-[0_24px_50px_-16px_rgba(23,9,31,0.6)] sm:h-[200px] sm:w-[180px] md:h-[230px] md:w-[210px] lg:h-[252px] lg:w-[240px]"
           >
-            {/* `initial={false}` so the first paint is not a slide-in — the
-                strip's entrance is handled by the wrapper above. Exactly
-                100%, not more: the outgoing card's right edge then stays
-                flush against the incoming card's left edge for the whole
-                move, so no gap opens up between them. */}
-            <AnimatePresence initial={false}>
-              <motion.div
-                key={cardIndex}
-                initial={{ x: "100%" }}
-                animate={{ x: "0%" }}
-                exit={{ x: "-100%" }}
-                transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
-                className="absolute inset-0 overflow-hidden rounded-2xl border border-white/60 bg-white"
-              >
-                <CardFace card={card} />
-              </motion.div>
-            </AnimatePresence>
-          </motion.div>
-        );
-      })}
-    </div>
+            <CardFace card={HERO_CARDS[item.cardIndex]} />
+          </div>
+        ))}
+      </motion.div>
+    </motion.div>
   );
 }
 
@@ -354,11 +373,11 @@ export default function Hero() {
         />
 
         {/* ---- Content --------------------------------------------- */}
-        <div className="relative z-10 mx-auto w-full max-w-6xl px-4 pt-20 sm:px-6 md:pt-28">
+        <div className="relative z-10 mx-auto w-full max-w-6xl px-4 pt-24 sm:px-6 md:pt-32">
           <div className="max-w-xl md:max-w-[54%]">
             <motion.h1
               {...rise(0.05)}
-              className="font-sans text-[clamp(2rem,5.4vw,3.9rem)] font-bold leading-[1.06] tracking-[-0.03em] text-white"
+              className="font-sans text-[clamp(2.1rem,5.6vw,4.3rem)] font-bold leading-[1.06] tracking-[-0.03em] text-white"
             >
               Adaptive. Sustainable.
               <br />
@@ -367,13 +386,13 @@ export default function Hero() {
 
             <motion.p
               {...rise(0.25)}
-              className="mt-5 max-w-md text-sm leading-relaxed text-white/70 md:text-base"
+              className="mt-7 max-w-md text-sm leading-relaxed text-white/70 md:mt-9 md:text-base"
             >
               Specialized personal training on-demand. Expert coaches come to
               you — at home, in your gym, or anywhere you prefer.
             </motion.p>
 
-            <motion.div {...rise(0.45)} className="mt-7">
+            <motion.div {...rise(0.45)} className="mt-9 md:mt-11">
               <a
                 href="#contact"
                 className="group inline-flex h-12 items-center gap-3 rounded-full bg-accent pl-7 pr-2 text-xs font-bold uppercase tracking-[0.18em] text-black transition hover:shadow-[0_16px_40px_-10px_rgba(241,255,3,0.6)]"
@@ -385,7 +404,7 @@ export default function Hero() {
               </a>
             </motion.div>
 
-            <motion.div {...rise(0.6)} className="mt-6 space-y-2">
+            <motion.div {...rise(0.6)} className="mt-8 space-y-2 md:mt-10">
               <p className="text-xs text-white/70">
                 Rated 4.9/5 by 500+ clients in Dubai
               </p>
@@ -395,7 +414,7 @@ export default function Hero() {
         </div>
 
         {/* ---- Card strip ------------------------------------------ */}
-        <div className="relative z-10 w-full overflow-hidden pb-10 md:pb-14">
+        <div className="relative z-10 w-full overflow-hidden pb-12 md:pb-16">
           <CardStrip />
         </div>
       </div>

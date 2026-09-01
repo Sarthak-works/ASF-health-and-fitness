@@ -265,7 +265,7 @@ function CardStrip() {
       initial={reduceMotion ? false : { opacity: 0, y: 60 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.8, delay: reduceMotion ? 0 : 0.7 }}
-      className="mt-12 w-full md:mt-16"
+      className="mt-8 w-full md:mt-10"
     >
       <motion.div
         ref={rowRef}
@@ -323,7 +323,7 @@ export default function Hero() {
       <div
         /* top corners only — the panel runs flush to the left, right and
            bottom edges of the viewport */
-        className="relative flex flex-col overflow-hidden rounded-t-[2rem]"
+        className="relative flex min-h-svh flex-col justify-between overflow-hidden rounded-t-[2rem]"
         style={{
           background:
             "linear-gradient(180deg, #1B0A2E 0%, #3B1668 26%, #552583 52%, #7B2CBF 78%, #9D4EDD 100%)",
@@ -373,11 +373,11 @@ export default function Hero() {
         />
 
         {/* ---- Content --------------------------------------------- */}
-        <div className="relative z-10 mx-auto w-full max-w-6xl px-4 pt-24 sm:px-6 md:pt-32">
-          <div className="max-w-xl md:max-w-[54%]">
+        <div className="relative z-10 mx-auto w-full max-w-6xl px-4 pt-28 sm:px-6 md:pt-36">
+          <div className="max-w-xl md:max-w-[70%]">
             <motion.h1
               {...rise(0.05)}
-              className="font-sans text-[clamp(2.1rem,5.6vw,4.3rem)] font-bold leading-[1.06] tracking-[-0.03em] text-white"
+              className="font-sans text-[clamp(2.1rem,5.2vw,4rem)] font-bold leading-[1.06] tracking-[-0.03em] text-white"
             >
               Adaptive. Sustainable.
               <br />
@@ -392,7 +392,7 @@ export default function Hero() {
               you — at home, in your gym, or anywhere you prefer.
             </motion.p>
 
-            <motion.div {...rise(0.45)} className="mt-9 md:mt-11">
+            <motion.div {...rise(0.45)} className="mt-9 md:mt-10">
               <a
                 href="#contact"
                 className="group inline-flex h-12 items-center gap-3 rounded-full bg-accent pl-7 pr-2 text-xs font-bold uppercase tracking-[0.18em] text-black transition hover:shadow-[0_16px_40px_-10px_rgba(241,255,3,0.6)]"
@@ -404,7 +404,7 @@ export default function Hero() {
               </a>
             </motion.div>
 
-            <motion.div {...rise(0.6)} className="mt-8 space-y-2 md:mt-10">
+            <motion.div {...rise(0.6)} className="mt-8 space-y-2">
               <p className="text-xs text-white/70">
                 Rated 4.9/5 by 500+ clients in Dubai
               </p>
@@ -414,7 +414,7 @@ export default function Hero() {
         </div>
 
         {/* ---- Card strip ------------------------------------------ */}
-        <div className="relative z-10 w-full overflow-hidden pb-12 md:pb-16">
+        <div className="relative z-10 w-full overflow-hidden pb-8 md:pb-10">
           <CardStrip />
         </div>
       </div>

@@ -6,14 +6,19 @@ import Image from "next/image";
 import { ArrowUpRight } from "lucide-react";
 
 /* ------------------------------------------------------------------ */
+/*  MOCK ASSET — replace when the client supplies the hero shot.       */
+/*  Wants a portrait-orientation photo; it is cropped to the right     */
+/*  half of the panel and anchored to the top.                         */
+/* ------------------------------------------------------------------ */
+const HERO_PORTRAIT = "/Akshay-suit.JPG";
+
+/* ------------------------------------------------------------------ */
 /*  Hero card deck                                                     */
 /*                                                                     */
-/*  These are placeholders built from assets already in /public.       */
-/*  To swap in the real Instagram slides: drop the exports into        */
-/*  /public/hero-slides/ and replace `src` below — the arc maths,      */
-/*  z-order and animation all derive from array position, so nothing   */
-/*  else needs to change. Keep the count odd-or-even agnostic; 6–10    */
-/*  cards all lay out correctly.                                       */
+/*  Placeholders built from assets already in /public. To swap in the  */
+/*  real Instagram slides: drop the exports into /public/hero-slides/  */
+/*  and replace `src` below. The strip derives everything from array   */
+/*  position, so nothing else needs to change.                         */
 /* ------------------------------------------------------------------ */
 
 type HeroCard =
@@ -90,32 +95,12 @@ const HERO_CARDS: HeroCard[] = [
   },
 ];
 
-/* Visible positions on the arc. The pool above is deliberately longer, so
-   every rotation brings a slide that is not already on screen. */
+/* Visible positions in the strip. The pool above is deliberately longer, so
+   every rotation brings on a slide that is not already on screen. */
 const SLOTS = 8;
 
 /* Dwell time per slide, in ms. */
 const ROTATE_MS = 3200;
-
-/* Arc geometry — every transform below is a pure function of the card's
-   normalised position `t` in [-1, 1], so the fan stays symmetrical
-   regardless of how many cards the array holds. */
-function arcTransform(index: number, total: number) {
-  const t = total === 1 ? 0 : (index / (total - 1)) * 2 - 1;
-  const distance = Math.abs(t);
-
-  return {
-    t,
-    /* The row is level — cards share one baseline rather than tracing a
-       curve. Depth comes from turning each card to face the centre and
-       letting the outer ones recede, not from lifting them off the line. */
-    rotateY: -t * 34,
-    translateZ: -distance * 90,
-    scale: 1 - distance * 0.08,
-    /* centre cards render in front */
-    zIndex: 20 - Math.round(distance * 10),
-  };
-}
 
 function CardFace({ card }: { card: HeroCard }) {
   switch (card.kind) {
@@ -126,12 +111,12 @@ function CardFace({ card }: { card: HeroCard }) {
             src={card.src}
             alt={card.alt}
             fill
-            sizes="200px"
+            sizes="220px"
             /* posters are 9:16 video stills — bias the crop to the face */
-            className="object-cover object-[center_28%]"
+            className="object-cover object-[center_25%]"
           />
           <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/80 to-transparent p-3 pt-8">
-            <p className="text-[10px] font-semibold leading-tight text-white">
+            <p className="text-[11px] font-semibold leading-tight text-white">
               {card.caption}
             </p>
           </div>
@@ -141,13 +126,13 @@ function CardFace({ card }: { card: HeroCard }) {
     case "stat":
       return (
         <div className="flex h-full w-full flex-col justify-between bg-white p-4">
-          <p className="text-[10px] font-medium text-gray-500">{card.label}</p>
+          <p className="text-[11px] font-medium text-gray-500">{card.label}</p>
           <div>
-            <p className="font-heading text-3xl font-black leading-none text-purple">
+            <p className="font-heading text-4xl font-black leading-none text-purple">
               {card.value}
             </p>
             {card.sub && (
-              <p className="mt-2 text-[10px] leading-snug text-gray-500">
+              <p className="mt-2 text-[11px] leading-snug text-gray-500">
                 {card.sub}
               </p>
             )}
@@ -158,15 +143,15 @@ function CardFace({ card }: { card: HeroCard }) {
     case "accent":
       return (
         <div className="flex h-full w-full flex-col justify-between bg-accent p-4">
-          <p className="text-[10px] font-semibold text-black/60">
+          <p className="text-[11px] font-semibold text-black/60">
             {card.label}
           </p>
           <div>
-            <p className="font-heading text-3xl font-black leading-none text-black">
+            <p className="font-heading text-4xl font-black leading-none text-black">
               {card.value}
             </p>
             {card.sub && (
-              <p className="mt-2 text-[10px] leading-snug text-black/70">
+              <p className="mt-2 text-[11px] leading-snug text-black/70">
                 {card.sub}
               </p>
             )}
@@ -177,7 +162,7 @@ function CardFace({ card }: { card: HeroCard }) {
     case "dark":
       return (
         <div className="flex h-full w-full flex-col justify-center bg-[#17091f] p-4">
-          <p className="text-[11px] leading-relaxed text-white/45">
+          <p className="text-[13px] leading-relaxed text-white/45">
             {card.lead}{" "}
             {card.highlight.map((word, i) => (
               <span key={word}>
@@ -191,14 +176,13 @@ function CardFace({ card }: { card: HeroCard }) {
   }
 }
 
-function CardArc() {
+function CardStrip() {
   const reduceMotion = useReducedMotion();
 
-  /* The arc positions themselves never move — animating eight cards along a
-     3D curve is expensive and reads as noise. Instead the slides advance
-     through fixed slots: on each tick every slot shows the next card in the
-     pool, entering from the right and leaving to the left, which is the
-     direction content would travel if the whole deck were rotating. */
+  /* The slots never move — the slides advance through them: on each tick
+     every slot shows the next card in the pool, entering from the right and
+     leaving to the left, the direction content would travel if the whole
+     strip were scrolling. */
   const [tick, setTick] = useState(0);
 
   useEffect(() => {
@@ -230,85 +214,61 @@ function CardArc() {
   }, [reduceMotion]);
 
   return (
-    /* The row is scaled down on small screens, but a CSS scale does not
-       shrink the layout box — so the fan is absolutely positioned inside a
-       wrapper whose height matches the *scaled* result (card height × the
-       scale at that breakpoint). Otherwise the leftover height shows up as
-       a large empty gap above the cards. */
+    /* Flat, level row that runs wider than the viewport and is clipped at
+       both edges by the panel, so the outermost cards read as continuing
+       past the frame. Card size is set per breakpoint rather than by a CSS
+       scale, so the layout box always matches what is drawn. */
     <div
       aria-hidden="true"
-      className="relative mt-4 h-[105px] w-full sm:h-[128px] md:mt-8 md:h-[162px] lg:h-[180px]"
-      style={{ perspective: "1600px" }}
+      className="mt-10 flex w-full shrink-0 justify-center gap-2 md:mt-14 md:gap-3"
     >
-      <div
-        className="absolute inset-x-0 bottom-0 flex origin-bottom items-end justify-center scale-[0.58] sm:scale-[0.7] md:scale-90 lg:scale-100"
-        style={{ transformStyle: "preserve-3d" }}
-      >
-        {Array.from({ length: SLOTS }).map((_, i) => {
-          const a = arcTransform(i, SLOTS);
-          const cardIndex = (i + tick) % HERO_CARDS.length;
-          const card = HERO_CARDS[cardIndex];
+      {Array.from({ length: SLOTS }).map((_, i) => {
+        const cardIndex = (i + tick) % HERO_CARDS.length;
+        const card = HERO_CARDS[cardIndex];
 
-          return (
-            /* Two elements on purpose: framer-motion animates `transform`
-               on the outer wrapper, so the static 3D fan transform has to
-               live on a separate inner node or it gets overwritten. */
-            <motion.div
-              key={i}
-              initial={reduceMotion ? false : { opacity: 0, y: 70 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{
-                duration: 0.7,
-                delay: reduceMotion ? 0 : 0.75 + Math.abs(a.t) * 0.12,
-                ease: [0.22, 1, 0.36, 1],
-              }}
-              style={{ zIndex: a.zIndex, transformStyle: "preserve-3d" }}
-              /* the outermost pair would be clipped mid-content on phones,
-                 so they only join the fan from `sm` up */
-              className={`-mx-4 shrink-0 ${
-                i === 0 || i === SLOTS - 1 ? "hidden sm:block" : ""
-              }`}
-            >
-              <div
-                style={{
-                  transform: `rotateY(${a.rotateY}deg) translateZ(${a.translateZ}px) scale(${a.scale})`,
-                }}
-                /* Clipping window only. The border, fill and radius live on
-                   the sliding card below so the whole card travels rather
-                   than just its contents. The shadow has to stay here — a
-                   box-shadow on the moving card would be clipped off by
-                   this overflow. */
-                className="relative h-[178px] w-[158px] overflow-hidden rounded-2xl shadow-[0_24px_50px_-16px_rgba(23,9,31,0.6)]"
+        return (
+          <motion.div
+            key={i}
+            initial={reduceMotion ? false : { opacity: 0, y: 60 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{
+              duration: 0.7,
+              delay: reduceMotion ? 0 : 0.7 + i * 0.06,
+              ease: [0.22, 1, 0.36, 1],
+            }}
+            /* Clipping window only. The border, fill and radius live on the
+               sliding card below so the whole card travels rather than just
+               its contents. The shadow has to stay here — a box-shadow on
+               the moving card would be clipped off by this overflow. */
+            className="relative h-[150px] w-[124px] shrink-0 overflow-hidden rounded-2xl shadow-[0_24px_50px_-16px_rgba(23,9,31,0.6)] sm:h-[170px] sm:w-[150px] md:h-[190px] md:w-[178px] lg:h-[200px] lg:w-[196px]"
+          >
+            {/* `initial={false}` so the first paint is not a slide-in — the
+                strip's entrance is handled by the wrapper above. Exactly
+                100%, not more: the outgoing card's right edge then stays
+                flush against the incoming card's left edge for the whole
+                move, so no gap opens up between them. */}
+            <AnimatePresence initial={false}>
+              <motion.div
+                key={cardIndex}
+                initial={{ x: "100%" }}
+                animate={{ x: "0%" }}
+                exit={{ x: "-100%" }}
+                transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
+                className="absolute inset-0 overflow-hidden rounded-2xl border border-white/60 bg-white"
               >
-                {/* `initial={false}` so the first paint is not a slide-in —
-                    the deck's entrance is handled by the wrapper above.
-                    Exactly 100%, not more: the outgoing card's right edge
-                    then stays flush against the incoming card's left edge
-                    for the whole move, so no gap opens up between them. */}
-                <AnimatePresence initial={false}>
-                  <motion.div
-                    key={cardIndex}
-                    initial={{ x: "100%" }}
-                    animate={{ x: "0%" }}
-                    exit={{ x: "-100%" }}
-                    transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
-                    className="absolute inset-0 overflow-hidden rounded-2xl border border-white/60 bg-white"
-                  >
-                    <CardFace card={card} />
-                  </motion.div>
-                </AnimatePresence>
-              </div>
-            </motion.div>
-          );
-        })}
-      </div>
+                <CardFace card={card} />
+              </motion.div>
+            </AnimatePresence>
+          </motion.div>
+        );
+      })}
     </div>
   );
 }
 
 function StarRating() {
   return (
-    <div className="flex items-center justify-center gap-1">
+    <div className="flex items-center gap-1">
       {[...Array(5)].map((_, i) => (
         <svg
           key={i}
@@ -344,79 +304,99 @@ export default function Hero() {
       <div
         /* top corners only — the panel runs flush to the left, right and
            bottom edges of the viewport */
-        className="relative overflow-hidden rounded-t-[2rem]"
+        className="relative flex flex-col overflow-hidden rounded-t-[2rem]"
         style={{
           background:
             "linear-gradient(180deg, #1B0A2E 0%, #3B1668 26%, #552583 52%, #7B2CBF 78%, #9D4EDD 100%)",
         }}
       >
+        {/* Portrait, bled into the right half of the panel. */}
+        <div className="pointer-events-none absolute inset-y-0 right-0 w-full md:w-[54%]">
+          <Image
+            src={HERO_PORTRAIT}
+            alt=""
+            fill
+            priority
+            sizes="(max-width: 768px) 100vw, 54vw"
+            className="object-cover object-top"
+            /* Fade the photo itself rather than laying a colour over it. The
+               panel behind is a vertical gradient, so no single overlay
+               colour can match it at every height — one always leaves a hard
+               seam down the photo's left edge. Masking lets the panel's own
+               gradient show through instead. */
+            style={{
+              WebkitMaskImage:
+                "linear-gradient(to right, transparent 0%, #000 58%), linear-gradient(to top, transparent 0%, #000 34%)",
+              maskImage:
+                "linear-gradient(to right, transparent 0%, #000 58%), linear-gradient(to top, transparent 0%, #000 34%)",
+              WebkitMaskComposite: "source-in",
+              maskComposite: "intersect",
+            }}
+          />
+          {/* On mobile there is no room for the text to sit beside the photo,
+              so it sits on top of it. Weighted towards the top, where the
+              headline lands on the brightest part of the shot and would
+              otherwise be white-on-white. */}
+          <div className="absolute inset-0 bg-gradient-to-b from-[#1B0A2E] via-[#1B0A2E]/88 to-[#3B1668]/45 md:hidden" />
+        </div>
+
         {/* Soft cloud banks — layered radial gradients rather than photos,
             so the hero stays asset-free and sharp at every viewport. */}
         <div
-          className="pointer-events-none absolute inset-0 opacity-90"
+          className="pointer-events-none absolute inset-0 opacity-80"
           style={{
             background: [
-              "radial-gradient(58% 30% at 10% 82%, rgba(255,255,255,0.34), transparent 68%)",
-              "radial-gradient(50% 26% at 90% 76%, rgba(255,255,255,0.28), transparent 68%)",
-              "radial-gradient(64% 34% at 50% 108%, rgba(241,255,3,0.22), transparent 66%)",
-              "radial-gradient(44% 24% at 28% 100%, rgba(255,255,255,0.40), transparent 70%)",
-              "radial-gradient(44% 24% at 74% 102%, rgba(255,255,255,0.34), transparent 70%)",
-              "radial-gradient(80% 50% at 50% 0%, rgba(157,78,221,0.35), transparent 70%)",
+              "radial-gradient(58% 30% at 10% 82%, rgba(255,255,255,0.30), transparent 68%)",
+              "radial-gradient(64% 34% at 50% 108%, rgba(241,255,3,0.20), transparent 66%)",
+              "radial-gradient(44% 24% at 28% 100%, rgba(255,255,255,0.34), transparent 70%)",
             ].join(","),
           }}
         />
-        {/* Warm accent glow behind the headline */}
-        <div className="pointer-events-none absolute left-1/2 top-0 h-[420px] w-[720px] -translate-x-1/2 rounded-full bg-accent/10 blur-[130px]" />
 
         {/* ---- Content --------------------------------------------- */}
-        <div className="relative z-10 mx-auto flex max-w-6xl flex-col items-center px-4 pb-16 pt-20 text-center sm:px-6 md:pb-20 md:pt-28">
-          <motion.h1
-            {...rise(0.05)}
-            className="max-w-4xl font-sans text-[clamp(2.1rem,6.2vw,4.4rem)] font-bold leading-[1.06] tracking-[-0.03em] text-white"
-          >
-            Adaptive. Sustainable.
-            <br />
-            <span className="text-white/55">Fitness.</span>
-          </motion.h1>
-
-          <motion.p
-            {...rise(0.25)}
-            className="mt-6 max-w-xl text-sm leading-relaxed text-white/70 md:text-base"
-          >
-            Specialized personal training on-demand. Expert coaches come to you
-            — at home, in your gym, or anywhere you prefer.
-          </motion.p>
-
-          <motion.div
-            {...rise(0.45)}
-            className="mt-8 flex flex-col items-center gap-3 sm:flex-row sm:gap-4"
-          >
-            <a
-              href="#services"
-              className="inline-flex h-12 items-center justify-center rounded-full bg-white/10 px-7 text-xs font-semibold uppercase tracking-[0.18em] text-white ring-1 ring-inset ring-white/25 backdrop-blur-sm transition hover:bg-white/20"
+        <div className="relative z-10 mx-auto w-full max-w-6xl px-4 pt-20 sm:px-6 md:pt-28">
+          <div className="max-w-xl md:max-w-[54%]">
+            <motion.h1
+              {...rise(0.05)}
+              className="font-sans text-[clamp(2rem,5.4vw,3.9rem)] font-bold leading-[1.06] tracking-[-0.03em] text-white"
             >
-              Our Programs
-            </a>
+              Adaptive. Sustainable.
+              <br />
+              <span className="text-white/55">Fitness.</span>
+            </motion.h1>
 
-            <a
-              href="#contact"
-              className="group inline-flex h-12 items-center gap-3 rounded-full bg-accent pl-7 pr-2 text-xs font-bold uppercase tracking-[0.18em] text-black transition hover:shadow-[0_16px_40px_-10px_rgba(241,255,3,0.6)]"
+            <motion.p
+              {...rise(0.25)}
+              className="mt-5 max-w-md text-sm leading-relaxed text-white/70 md:text-base"
             >
-              Book Free Assessment
-              <span className="flex h-9 w-9 items-center justify-center rounded-full bg-black transition-transform duration-300 group-hover:rotate-45">
-                <ArrowUpRight className="h-4 w-4 text-accent" />
-              </span>
-            </a>
-          </motion.div>
+              Specialized personal training on-demand. Expert coaches come to
+              you — at home, in your gym, or anywhere you prefer.
+            </motion.p>
 
-          <CardArc />
+            <motion.div {...rise(0.45)} className="mt-7">
+              <a
+                href="#contact"
+                className="group inline-flex h-12 items-center gap-3 rounded-full bg-accent pl-7 pr-2 text-xs font-bold uppercase tracking-[0.18em] text-black transition hover:shadow-[0_16px_40px_-10px_rgba(241,255,3,0.6)]"
+              >
+                Book Free Assessment
+                <span className="flex h-9 w-9 items-center justify-center rounded-full bg-black transition-transform duration-300 group-hover:rotate-45">
+                  <ArrowUpRight className="h-4 w-4 text-accent" />
+                </span>
+              </a>
+            </motion.div>
 
-          <motion.div {...rise(1.5)} className="mt-8 space-y-2">
-            <p className="text-xs text-white/70">
-              Rated 4.9/5 by 500+ clients in Dubai
-            </p>
-            <StarRating />
-          </motion.div>
+            <motion.div {...rise(0.6)} className="mt-6 space-y-2">
+              <p className="text-xs text-white/70">
+                Rated 4.9/5 by 500+ clients in Dubai
+              </p>
+              <StarRating />
+            </motion.div>
+          </div>
+        </div>
+
+        {/* ---- Card strip ------------------------------------------ */}
+        <div className="relative z-10 w-full overflow-hidden pb-10 md:pb-14">
+          <CardStrip />
         </div>
       </div>
     </section>

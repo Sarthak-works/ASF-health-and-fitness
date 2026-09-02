@@ -13,85 +13,44 @@ import { ArrowUpRight } from "lucide-react";
 const HERO_PORTRAIT = "/Akshay-suit.JPG";
 
 /* ------------------------------------------------------------------ */
-/*  Hero card deck                                                     */
+/*  Hero slides                                                        */
 /*                                                                     */
-/*  Placeholders built from assets already in /public. To swap in the  */
-/*  real Instagram slides: drop the exports into /public/hero-slides/  */
-/*  and replace `src` below. The strip derives everything from array   */
-/*  position, so nothing else needs to change.                         */
+/*  The client's Instagram carousel, exported at 1024x1280 (4:5). Each */
+/*  slide is a finished creative — name, headline, sub-line and CTA    */
+/*  are baked into the artwork — so a card is just the image, shown    */
+/*  uncropped at its native ratio.                                     */
 /* ------------------------------------------------------------------ */
 
-type HeroCard =
-  | { kind: "photo"; src: string; alt: string; caption: string }
-  | { kind: "stat"; label: string; value: string; sub?: string }
-  | { kind: "accent"; label: string; value: string; sub?: string }
-  | { kind: "dark"; lead: string; highlight: string[] };
+type HeroSlide = { src: string; alt: string };
 
-const HERO_CARDS: HeroCard[] = [
+const HERO_SLIDES: HeroSlide[] = [
   {
-    kind: "photo",
-    src: "/testimonial-video-posters/kiran 15-5_frame-001.jpg",
-    alt: "ASF client Kiran sharing her coaching experience",
-    caption: "Real client stories",
+    src: "/hero-slides/diantha-knee-pain.jpg",
+    alt: "Diantha, a Dubai professional, lost weight without aggravating her knee pain with ASF Coaching",
   },
   {
-    kind: "stat",
-    label: "Coached to date",
-    value: "500+",
-    sub: "Clients across Dubai",
+    src: "/hero-slides/farzan-40kg-weight-loss.jpg",
+    alt: "Farzan, a Dubai professional, achieved a 40 kg weight loss transformation with ASF Coaching",
   },
   {
-    kind: "dark",
-    lead: "Coaching that combines",
-    highlight: ["Training", "Nutrition", "Mindset"],
+    src: "/hero-slides/esther-scoliosis-mobility.jpg",
+    alt: "Esther, a Dubai teenager, improved her mobility while managing scoliosis and lost 10 kg with ASF Coaching",
   },
   {
-    kind: "photo",
-    src: "/testimonial-video-posters/Farzan 26-5_frame-001.jpg",
-    alt: "ASF client Farzan after a personal training programme",
-    caption: "1-on-1 with expert coaches",
+    src: "/hero-slides/sharda-postpartum-strength.jpg",
+    alt: "Sharda Gulani, a new mom, regained her strength after pregnancy with ASF Coaching",
   },
   {
-    kind: "accent",
-    label: "Sessions delivered",
-    value: "25k+",
-    sub: "At home, in the gym, anywhere you train.",
+    src: "/hero-slides/kiran-back-pain.jpg",
+    alt: "Kiran Luthra, a Dubai professional, overcame serious back pain and moved pain-free again with ASF Coaching",
   },
   {
-    kind: "photo",
-    src: "/testimonial-video-posters/rupesh 12-6_frame-001.jpg",
-    alt: "ASF client Rupesh describing his transformation",
-    caption: "12-week transformations",
+    src: "/hero-slides/bethya-motherhood.jpg",
+    alt: "Bethya, a Dubai mom, built a stronger foundation for motherhood with ASF Coaching",
   },
   {
-    kind: "stat",
-    label: "Average rating",
-    value: "4.9",
-    sub: "From verified Google reviews",
-  },
-  {
-    kind: "photo",
-    src: "/testimonial-video-posters/Satish 25-5_frame-001.jpg",
-    alt: "ASF client Satish training with a coach",
-    caption: "Train anywhere you like",
-  },
-  {
-    kind: "photo",
-    src: "/testimonial-video-posters/Chronic back pain 16-5_frame-001.jpg",
-    alt: "ASF client describing relief from chronic back pain",
-    caption: "Pain-free movement",
-  },
-  {
-    kind: "stat",
-    label: "Certified coaches",
-    value: "20+",
-    sub: "Across strength, rehab and nutrition",
-  },
-  {
-    kind: "photo",
-    src: "/testimonial-video-posters/Mathangi.jpg",
-    alt: "ASF client Mathangi sharing her results",
-    caption: "Coaching that fits your life",
+    src: "/hero-slides/satish-shoulder-mobility.jpg",
+    alt: "Satish, a Dubai professional, regained shoulder strength and mobility with ASF Coaching",
   },
 ];
 
@@ -103,78 +62,20 @@ const RENDERED = 10;
 const ROTATE_MS = 3200;
 const STEP_MS = 850;
 
-function CardFace({ card }: { card: HeroCard }) {
-  switch (card.kind) {
-    case "photo":
-      return (
-        <div className="relative h-full w-full">
-          <Image
-            src={card.src}
-            alt={card.alt}
-            fill
-            sizes="220px"
-            /* posters are 9:16 video stills — bias the crop to the face */
-            className="object-cover object-[center_25%]"
-          />
-          <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/80 to-transparent p-3 pt-8">
-            <p className="text-[11px] font-semibold leading-tight text-white">
-              {card.caption}
-            </p>
-          </div>
-        </div>
-      );
-
-    case "stat":
-      return (
-        <div className="flex h-full w-full flex-col justify-between bg-white p-4">
-          <p className="text-[11px] font-medium text-gray-500">{card.label}</p>
-          <div>
-            <p className="font-heading text-4xl font-black leading-none text-purple">
-              {card.value}
-            </p>
-            {card.sub && (
-              <p className="mt-2 text-[11px] leading-snug text-gray-500">
-                {card.sub}
-              </p>
-            )}
-          </div>
-        </div>
-      );
-
-    case "accent":
-      return (
-        <div className="flex h-full w-full flex-col justify-between bg-accent p-4">
-          <p className="text-[11px] font-semibold text-black/60">
-            {card.label}
-          </p>
-          <div>
-            <p className="font-heading text-4xl font-black leading-none text-black">
-              {card.value}
-            </p>
-            {card.sub && (
-              <p className="mt-2 text-[11px] leading-snug text-black/70">
-                {card.sub}
-              </p>
-            )}
-          </div>
-        </div>
-      );
-
-    case "dark":
-      return (
-        <div className="flex h-full w-full flex-col justify-center bg-[#17091f] p-4">
-          <p className="text-[13px] leading-relaxed text-white/45">
-            {card.lead}{" "}
-            {card.highlight.map((word, i) => (
-              <span key={word}>
-                <span className="font-bold text-white">{word}</span>
-                {i < card.highlight.length - 1 ? ", " : "."}
-              </span>
-            ))}
-          </p>
-        </div>
-      );
-  }
+function SlideCard({ slide }: { slide: HeroSlide }) {
+  return (
+    <Image
+      src={slide.src}
+      alt={slide.alt}
+      fill
+      sizes="(max-width: 768px) 160px, 240px"
+      /* The strip is above the fold, so these must not lazy-load — the
+         default would leave it blank until the viewport observer fires.
+         Seven files, ~436KB total. */
+      loading="eager"
+      className="object-cover"
+    />
+  );
 }
 
 type StripItem = { id: number; cardIndex: number };
@@ -193,12 +94,12 @@ function CardStrip() {
   const [items, setItems] = useState<StripItem[]>(() =>
     Array.from({ length: RENDERED }, (_, i) => ({
       id: i,
-      cardIndex: i % HERO_CARDS.length,
+      cardIndex: i % HERO_SLIDES.length,
     })),
   );
 
   const nextId = useRef(RENDERED);
-  const nextCard = useRef(RENDERED % HERO_CARDS.length);
+  const nextCard = useRef(RENDERED % HERO_SLIDES.length);
 
   useEffect(() => {
     if (reduceMotion) return;
@@ -228,7 +129,7 @@ function CardStrip() {
         ...prev.slice(1),
         { id: nextId.current++, cardIndex: nextCard.current },
       ]);
-      nextCard.current = (nextCard.current + 1) % HERO_CARDS.length;
+      nextCard.current = (nextCard.current + 1) % HERO_SLIDES.length;
       controls.set({ x: 0 });
     };
 
@@ -265,7 +166,7 @@ function CardStrip() {
       initial={reduceMotion ? false : { opacity: 0, y: 60 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.8, delay: reduceMotion ? 0 : 0.7 }}
-      className="mt-8 w-full md:mt-10"
+      className="mt-6 w-full md:mt-8"
     >
       <motion.div
         ref={rowRef}
@@ -275,9 +176,9 @@ function CardStrip() {
         {items.map((item) => (
           <div
             key={item.id}
-            className="h-[170px] w-[150px] shrink-0 overflow-hidden rounded-2xl border border-white/60 bg-white shadow-[0_24px_50px_-16px_rgba(23,9,31,0.6)] sm:h-[200px] sm:w-[180px] md:h-[230px] md:w-[210px] lg:h-[252px] lg:w-[240px]"
+            className="relative aspect-[4/5] w-[168px] shrink-0 overflow-hidden rounded-2xl border border-white/60 bg-[#3B1668] shadow-[0_24px_50px_-16px_rgba(23,9,31,0.6)] sm:w-[190px] md:w-[204px] lg:w-[224px]"
           >
-            <CardFace card={HERO_CARDS[item.cardIndex]} />
+            <SlideCard slide={HERO_SLIDES[item.cardIndex]} />
           </div>
         ))}
       </motion.div>
@@ -414,7 +315,7 @@ export default function Hero() {
         </div>
 
         {/* ---- Card strip ------------------------------------------ */}
-        <div className="relative z-10 w-full overflow-hidden pb-8 md:pb-10">
+        <div className="relative z-10 w-full overflow-hidden pb-6 md:pb-8">
           <CardStrip />
         </div>
       </div>

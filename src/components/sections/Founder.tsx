@@ -6,13 +6,6 @@ import { CardBody, CardContainer, CardItem } from "@/components/ui/3d-card";
 export default function Founder() {
   const founders = [
     {
-      name: "Suraj Shetty",
-      role: "CEO Asf Coaching",
-      image: "/Suraj.jpg",
-      bio: "12+ yrs. Coaching Experience | Indian National basketball player | 300+ Clients Trained",
-      objectPosition: "center 15%",
-    },
-    {
       name: "Akshay Sahu",
       role: " Founder / CMO Asf Coaching",
       image: "/Akshay-suit.JPG",
@@ -30,7 +23,7 @@ export default function Founder() {
           viewport={{ once: true }}
           className="section-label mb-4 md:mb-6 block transition-all"
         >
-          MEET THE FOUNDERS
+          MEET THE FOUNDER
         </motion.span>
 
         <motion.h2
@@ -42,7 +35,7 @@ export default function Founder() {
           Leadership At ASF
         </motion.h2>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-12 max-w-5xl mx-auto">
+        <div className="max-w-md mx-auto">
           {founders.map((founder, i) => (
             <motion.div
               key={founder.name}

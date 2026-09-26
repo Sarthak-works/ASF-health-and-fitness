@@ -10,7 +10,7 @@ import { ArrowUpRight } from "lucide-react";
 /*  Wants a portrait-orientation photo; it is cropped to the right     */
 /*  half of the panel and anchored to the top.                         */
 /* ------------------------------------------------------------------ */
-const HERO_PORTRAIT = "/Akshay-suit.JPG";
+const HERO_PORTRAIT = "/hero-slides/hero-banner1.jpg";
 
 /* ------------------------------------------------------------------ */
 /*  Hero slides                                                        */

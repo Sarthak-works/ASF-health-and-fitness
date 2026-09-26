@@ -52,8 +52,8 @@ const contactDetails = [
   {
     icon: Mail,
     label: "Email",
-    value: "suraj@asfhealthandfitness.com",
-    href: "mailto:suraj@asfhealthandfitness.com",
+    value: "akshay@asfcoaching.com",
+    href: "mailto:akshay@asfcoaching.com",
   },
   {
     icon: Phone,

@@ -18,9 +18,27 @@ import {
   Linkedin,
   Send,
   Flame,
+  ChevronDown,
 } from "lucide-react";
 import { FaAppStoreIos, FaGooglePlay } from "react-icons/fa";
 import { TextGenerateEffect } from "@/components/ui/TextGenerateEffect";
+
+/* Time slots offered in the form. The value is what gets sent to the sheet. */
+const TIME_SLOTS = [
+  "10:00AM-12:00PM",
+  "1:00PM-4:00PM",
+  "6:00PM-8:00PM",
+  "8:00PM-10:00PM",
+  "AVAILABLE ANY TIME",
+] as const;
+
+/* Today as YYYY-MM-DD in the visitor's local time (not UTC), so the calendar
+   never lets someone pick a day that has already passed. */
+const getToday = () => {
+  const d = new Date();
+  const pad = (n: number) => String(n).padStart(2, "0");
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+};
 
 const schema = z.object({
   name: z.string().min(2, "Name is required"),
@@ -33,6 +51,11 @@ const schema = z.object({
     ),
   coachingType: z.string().min(1, "Please select a coaching type"),
   budget: z.string().min(1, "Please select a budget scale"),
+  preferredDate: z
+    .string()
+    .min(1, "Please pick a date")
+    .refine((v) => v >= getToday(), "Pick today or a later date"),
+  preferredTimeSlot: z.string().min(1, "Please select a time slot"),
   message: z
     .string()
     .min(10, "Message must be at least 10 characters")
@@ -155,7 +178,14 @@ export default function ContactFooter() {
     handleSubmit,
     formState: { errors, isSubmitting },
     reset,
-  } = useForm<FormData>({ resolver: zodResolver(schema) });
+    watch,
+  } = useForm<FormData>({
+    resolver: zodResolver(schema),
+    defaultValues: { preferredDate: "", preferredTimeSlot: "" },
+  });
+
+  const dateValue = watch("preferredDate");
+  const slotValue = watch("preferredTimeSlot");
 
   const INTERAKT_API_KEY =
     "alJ0dUltUlFBR1dTNy1RVGZpY1BhSTBocEtPRl9DUHJ3VnJjc3F2WTQxTTo=";
@@ -163,6 +193,8 @@ export default function ContactFooter() {
   const onSubmit = async (data: FormData) => {
     setSubmitError(false);
     try {
+      // `...data` already includes preferredDate and preferredTimeSlot,
+      // which the Apps Script writes to the sheet and forwards to Pabbly.
       await fetch(GOOGLE_SCRIPT_URL, {
         method: "POST",
         mode: "no-cors",
@@ -190,6 +222,8 @@ export default function ContactFooter() {
             email: data.email,
             coachingType: data.coachingType,
             budget: data.budget,
+            preferredDate: data.preferredDate,
+            preferredTimeSlot: data.preferredTimeSlot,
             message: data.message,
             leadSource: "Website Contact Form",
           },
@@ -198,6 +232,7 @@ export default function ContactFooter() {
 
       setSubmitted(true);
       reset();
+      setCharCount(0);
       window.location.href = "/thank-you";
     } catch (err) {
       console.error("Submission error:", err);
@@ -270,7 +305,11 @@ export default function ContactFooter() {
                 </p>
               </motion.div>
             ) : (
-              <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+              <form
+                onSubmit={handleSubmit(onSubmit)}
+                className="space-y-4"
+                noValidate
+              >
                 {formFields.map((field, i) => (
                   <motion.div
                     key={field.id}
@@ -301,6 +340,7 @@ export default function ContactFooter() {
                   </motion.div>
                 ))}
 
+                {/* Coaching type + budget */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-1 pb-1">
                   <motion.div
                     initial={{ opacity: 0, y: 15 }}
@@ -366,11 +406,103 @@ export default function ContactFooter() {
                   </motion.div>
                 </div>
 
+                {/* ---- Preferred date + time slot ---- */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pb-1">
+                  <motion.div
+                    initial={{ opacity: 0, y: 15 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ delay: 0.4 }}
+                    className="space-y-1.5"
+                  >
+                    <Label
+                      htmlFor="preferredDate"
+                      className="text-[11px] font-bold uppercase tracking-wider text-gray-400"
+                    >
+                      Preferred Date
+                    </Label>
+                    {/* Native date input: opens the browser's calendar picker.
+                        While empty, the browser's own placeholder text is
+                        hidden and a consistent "Select a date" hint is shown. */}
+                    <div className="relative">
+                      <Input
+                        id="preferredDate"
+                        type="date"
+                        min={getToday()}
+                        className={`peer block h-10 w-full max-w-full appearance-none text-left text-xs [color-scheme:dark] [&::-webkit-date-and-time-value]:text-left ${
+                          dateValue
+                            ? "text-white"
+                            : "text-transparent focus:text-white"
+                        }`}
+                        onClick={(e) => {
+                          try {
+                            e.currentTarget.showPicker?.();
+                          } catch {
+                            /* picker not supported: native UI still works */
+                          }
+                        }}
+                        {...register("preferredDate")}
+                      />
+                      {!dateValue && (
+                        <span className="pointer-events-none absolute inset-y-0 left-3 flex items-center text-xs text-neutral-400 peer-focus:hidden">
+                          Select a date
+                        </span>
+                      )}
+                    </div>
+                    {errors.preferredDate && (
+                      <p className="text-red-400 text-[10px]">
+                        {errors.preferredDate.message}
+                      </p>
+                    )}
+                  </motion.div>
+
+                  <motion.div
+                    initial={{ opacity: 0, y: 15 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ delay: 0.45 }}
+                    className="space-y-1.5"
+                  >
+                    <Label
+                      htmlFor="preferredTimeSlot"
+                      className="text-[11px] font-bold uppercase tracking-wider text-gray-400"
+                    >
+                      Time Slot
+                    </Label>
+                    <div className="relative">
+                      <select
+                        id="preferredTimeSlot"
+                        {...register("preferredTimeSlot")}
+                        className={`w-full bg-zinc-800 rounded-md px-3 pr-9 h-10 text-xs border-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neutral-400 transition duration-300 appearance-none ${
+                          slotValue ? "text-white" : "text-neutral-400"
+                        }`}
+                      >
+                        <option value="">Select time slot</option>
+                        {TIME_SLOTS.map((slot) => (
+                          <option key={slot} value={slot}>
+                            {slot}
+                          </option>
+                        ))}
+                      </select>
+                      <ChevronDown
+                        className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-white/50"
+                        aria-hidden="true"
+                      />
+                    </div>
+                    {errors.preferredTimeSlot && (
+                      <p className="text-red-400 text-[10px]">
+                        {errors.preferredTimeSlot.message}
+                      </p>
+                    )}
+                  </motion.div>
+                </div>
+
+                {/* Message */}
                 <motion.div
                   initial={{ opacity: 0, y: 15 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
-                  transition={{ delay: 0.35 }}
+                  transition={{ delay: 0.5 }}
                   className="space-y-1.5"
                 >
                   <div className="flex justify-between items-center">
@@ -389,8 +521,9 @@ export default function ContactFooter() {
                     rows={2}
                     maxLength={180}
                     placeholder="Tell us about your goals..."
-                    {...register("message")}
-                    onChange={(e) => setCharCount(e.target.value.length)}
+                    {...register("message", {
+                      onChange: (e) => setCharCount(e.target.value.length),
+                    })}
                     className="w-full bg-zinc-800 text-white rounded-md px-3 py-2 text-xs border-none placeholder:text-neutral-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neutral-400 resize-none transition duration-300"
                   />
                   {errors.message && (
@@ -410,7 +543,7 @@ export default function ContactFooter() {
                   initial={{ opacity: 0, y: 15 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
-                  transition={{ delay: 0.45 }}
+                  transition={{ delay: 0.55 }}
                 >
                   <MovingBorderButton
                     as="button"

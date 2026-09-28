@@ -1,13 +1,319 @@
+// "use client";
+
+// import { useState, useEffect } from "react";
+// import { motion, AnimatePresence } from "framer-motion";
+// import { X, Send, Sparkles } from "lucide-react";
+// import { useForm } from "react-hook-form";
+// import { zodResolver } from "@hookform/resolvers/zod";
+// import * as z from "zod";
+// import { Input, Label } from "@/components/ui/signup-form-elements";
+// import { Button as MovingBorderButton } from "@/components/ui/moving-border";
+
+// const schema = z.object({
+//   name: z.string().min(2, "Name is required"),
+//   email: z.string().email("Valid email required"),
+//   phone: z
+//     .string()
+//     .regex(
+//       /^\+971[- ]?5[0-9][- ]?\d{7}$/,
+//       "Enter a valid UAE mobile number (e.g. +971 50 1234567)",
+//     ),
+// });
+
+// type FormData = z.infer<typeof schema>;
+
+// // Google Apps Script handles  gsheet(used samsonmendonca021acc for the google sheet) submission and pabbly handles crm and interakt submission,
+// // and the URL:https://docs.google.com/spreadsheets/d/1xs4IDB9_qBK1YaR37Wcu6XEszM2uO8TaSlWAYPdv00E/edit?usp=sharing
+
+// const GOOGLE_SCRIPT_URL =
+//   "https://script.google.com/macros/s/AKfycbzzKDPITpkkZ9oq9-4-v5rlrjaOhSO0MzAMR6KzeXWabDNHLoX2oaiUrjbd90FKbMs/exec";
+
+// export default function LeadPopup() {
+//   const [isOpen, setIsOpen] = useState(false);
+//   const [hasTriggeredExit, setHasTriggeredExit] = useState(false);
+//   const [submitted, setSubmitted] = useState(false);
+//   const [submitError, setSubmitError] = useState(false);
+
+//   const {
+//     register,
+//     handleSubmit,
+//     formState: { errors, isSubmitting },
+//     reset,
+//   } = useForm<FormData>({ resolver: zodResolver(schema) });
+
+//   useEffect(() => {
+//     const entryTimer = setTimeout(() => {
+//       if (!sessionStorage.getItem("popupShown")) {
+//         setIsOpen(true);
+//         sessionStorage.setItem("popupShown", "true");
+//       }
+//     }, 4000);
+
+//     const handleMouseLeave = (e: MouseEvent) => {
+//       if (e.clientY < 20 && !hasTriggeredExit) {
+//         setIsOpen(true);
+//         setHasTriggeredExit(true);
+//         sessionStorage.setItem("popupShown", "true");
+//       }
+//     };
+
+//     document.addEventListener("mouseleave", handleMouseLeave);
+
+//     return () => {
+//       clearTimeout(entryTimer);
+//       document.removeEventListener("mouseleave", handleMouseLeave);
+//     };
+//   }, [hasTriggeredExit]);
+
+//   const closePopup = () => setIsOpen(false);
+
+//   const onSubmit = async (data: FormData) => {
+//     setSubmitError(false);
+//     try {
+//       await fetch(GOOGLE_SCRIPT_URL, {
+//         method: "POST",
+//         mode: "no-cors",
+//         headers: { "Content-Type": "application/json" },
+//         body: JSON.stringify({
+//           timestamp: new Date().toISOString(),
+//           ...data,
+//           coachingType: "Lead Popup",
+//           budget: "N/A",
+//           message: "Lead captured from entry/exit popup (Redesign)",
+//         }),
+//       });
+//       // With mode: "no-cors", the response is always opaque (status 0).
+//       // Reaching this line means the request was sent successfully.
+//       setSubmitted(true);
+//       reset();
+//       setTimeout(closePopup, 3000);
+//     } catch (err) {
+//       console.error("Submission error:", err);
+//       setSubmitError(true);
+//     }
+//   };
+
+//   return (
+//     <AnimatePresence>
+//       {isOpen && (
+//         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+//           <motion.div
+//             initial={{ opacity: 0 }}
+//             animate={{ opacity: 1 }}
+//             exit={{ opacity: 0 }}
+//             className="absolute inset-0 bg-black/80 backdrop-blur-md"
+//             onClick={closePopup}
+//           />
+//           <motion.div
+//             initial={{ scale: 0.9, opacity: 0, y: 40 }}
+//             animate={{ scale: 1, opacity: 1, y: 0 }}
+//             exit={{ scale: 0.9, opacity: 0, y: 40 }}
+//             transition={{ type: "spring", damping: 20, stiffness: 200 }}
+//             className="relative bg-gradient-to-br from-[#552583]/95 via-[#552583]/90 to-black/95 w-full max-w-md rounded-[2.5rem] shadow-[0_0_80px_-15px_rgba(85,37,131,0.4)] overflow-hidden z-10 p-6 md:p-8 border border-white/10 backdrop-blur-xl"
+//           >
+//             <div className="absolute -top-24 -left-24 w-64 h-64 bg-yellow/5 rounded-full blur-[80px] pointer-events-none" />
+//             <div className="absolute -bottom-24 -right-24 w-64 h-64 bg-purple/20 rounded-full blur-[80px] pointer-events-none" />
+
+//             {submitted ? (
+//               <motion.div
+//                 initial={{ opacity: 0, y: 20 }}
+//                 animate={{ opacity: 1, y: 0 }}
+//                 className="text-center py-12"
+//               >
+//                 <motion.div
+//                   initial={{ scale: 0 }}
+//                   animate={{ scale: 1 }}
+//                   transition={{ type: "spring", delay: 0.2 }}
+//                   className="w-24 h-24 bg-yellow rounded-full flex items-center justify-center mx-auto mb-8 shadow-[0_0_40px_rgba(241,255,3,0.4)]"
+//                 >
+//                   <Sparkles className="w-12 h-12 text-black" />
+//                 </motion.div>
+//                 <h3 className="text-4xl font-black text-white mb-4 tracking-tight">
+//                   Success!
+//                 </h3>
+//                 <p className="text-white/80 text-xl leading-relaxed font-medium max-w-xs mx-auto">
+//                   Your transformation journey starts now. We'll reach out
+//                   shortly.
+//                 </p>
+//               </motion.div>
+//             ) : (
+//               <div className="relative z-10">
+//                 <div className="text-center mb-6">
+//                   <motion.span
+//                     initial={{ opacity: 0, y: -10 }}
+//                     animate={{ opacity: 1, y: 0 }}
+//                     className="inline-flex items-center gap-2 bg-yellow text-black px-4 py-1 rounded-full text-[10px] font-black uppercase tracking-[0.2em] mb-4 shadow-[0_10px_20px_-5px_rgba(241,255,3,0.3)] animate-pulse"
+//                   >
+//                     <Sparkles className="w-3 h-3" />
+//                     Limited Time Offer
+//                   </motion.span>
+//                   <h3 className="text-2xl md:text-3xl font-black text-white mb-3 leading-tight tracking-tight">
+//                     Book Your <span className="text-yellow">Free</span>{" "}
+//                     Assessment!
+//                   </h3>
+//                   <p className="text-white/90 text-xs md:text-sm font-semibold leading-relaxed max-w-[280px] mx-auto italic">
+//                     "An expert trainer will visit you directly to build your
+//                     personalised roadmap to success."
+//                   </p>
+//                 </div>
+
+//                 <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+//                   <div className="grid grid-cols-1 gap-4">
+//                     <div className="space-y-1">
+//                       <Label
+//                         htmlFor="popup-name"
+//                         className="text-[10px] font-black uppercase tracking-widest text-white/50 ml-2"
+//                       >
+//                         Full Name
+//                       </Label>
+//                       <Input
+//                         id="popup-name"
+//                         placeholder="John Smith"
+//                         className="bg-white/5 border-white/10 text-white placeholder:text-white/20 h-11 rounded-xl focus-visible:ring-yellow focus-visible:bg-white/10 transition-all duration-300"
+//                         {...register("name")}
+//                       />
+//                       {errors.name && (
+//                         <p className="text-yellow text-[9px] font-bold ml-2">
+//                           {errors.name.message}
+//                         </p>
+//                       )}
+//                     </div>
+
+//                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+//                       <div className="space-y-1">
+//                         <Label
+//                           htmlFor="popup-email"
+//                           className="text-[10px] font-black uppercase tracking-widest text-white/50 ml-2"
+//                         >
+//                           Email
+//                         </Label>
+//                         <Input
+//                           id="popup-email"
+//                           type="email"
+//                           placeholder="john@example.com"
+//                           className="bg-white/5 border-white/10 text-white placeholder:text-white/20 h-11 rounded-xl focus-visible:ring-yellow focus-visible:bg-white/10 transition-all duration-300"
+//                           {...register("email")}
+//                         />
+//                         {errors.email && (
+//                           <p className="text-yellow text-[9px] font-bold ml-2">
+//                             {errors.email.message}
+//                           </p>
+//                         )}
+//                       </div>
+
+//                       <div className="space-y-1">
+//                         <Label
+//                           htmlFor="popup-phone"
+//                           className="text-[10px] font-black uppercase tracking-widest text-white/50 ml-2"
+//                         >
+//                           Phone
+//                         </Label>
+//                         <Input
+//                           id="popup-phone"
+//                           type="tel"
+//                           placeholder="+971 5X XXX"
+//                           className="bg-white/5 border-white/10 text-white placeholder:text-white/20 h-11 rounded-xl focus-visible:ring-yellow focus-visible:bg-white/10 transition-all duration-300"
+//                           {...register("phone")}
+//                         />
+//                         {errors.phone && (
+//                           <p className="text-yellow text-[9px] font-bold ml-2">
+//                             {errors.phone.message}
+//                           </p>
+//                         )}
+//                       </div>
+//                     </div>
+//                   </div>
+
+//                   {submitError && (
+//                     <p className="text-yellow text-[10px] font-bold text-center">
+//                       Something went wrong. Please try again.
+//                     </p>
+//                   )}
+
+//                   <motion.div
+//                     whileHover={{ scale: 1.02 }}
+//                     whileTap={{ scale: 0.98 }}
+//                     className="pt-2"
+//                   >
+//                     <MovingBorderButton
+//                       as="button"
+//                       type="submit"
+//                       disabled={isSubmitting}
+//                       borderRadius="1rem"
+//                       containerClassName="h-13 w-full"
+//                       className="bg-yellow text-black font-black text-xs tracking-widest uppercase flex items-center gap-3 justify-center shadow-[0_15px_30px_-8px_rgba(241,255,3,0.3)]"
+//                       borderClassName="bg-[radial-gradient(white_40%,transparent_60%)]"
+//                     >
+//                       {isSubmitting ? (
+//                         <motion.div
+//                           animate={{ rotate: 360 }}
+//                           transition={{
+//                             repeat: Infinity,
+//                             duration: 1,
+//                             ease: "linear",
+//                           }}
+//                         >
+//                           <Send className="w-5 h-5" />
+//                         </motion.div>
+//                       ) : (
+//                         <>
+//                           Claim My Free Session
+//                           <Send className="w-5 h-5" />
+//                         </>
+//                       )}
+//                     </MovingBorderButton>
+//                   </motion.div>
+//                 </form>
+
+//                 <p className="mt-6 text-center text-[9px] text-white/30 font-bold uppercase tracking-widest">
+//                   Secure • Confidential • Real Results
+//                 </p>
+//               </div>
+//             )}
+
+//             <button
+//               onClick={(e) => {
+//                 e.stopPropagation();
+//                 closePopup();
+//               }}
+//               className="absolute top-6 right-6 text-white/40 hover:text-white transition-all hover:rotate-90 duration-300 z-50 p-2"
+//               aria-label="Close popup"
+//             >
+//               <X size={24} />
+//             </button>
+//           </motion.div>
+//         </div>
+//       )}
+//     </AnimatePresence>
+//   );
+// }
 "use client";
 
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, Send, Sparkles } from "lucide-react";
+import { X, Send, Sparkles, ChevronDown } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { Input, Label } from "@/components/ui/signup-form-elements";
 import { Button as MovingBorderButton } from "@/components/ui/moving-border";
+
+/* Time slots offered in the popup. The value is what gets sent to the sheet. */
+const TIME_SLOTS = [
+  "10:00AM-12:00PM",
+  "1:00PM-4:00PM",
+  "6:00PM-8:00PM",
+  "8:00PM-10:00PM",
+  "AVAILABLE ANY TIME",
+] as const;
+
+/* Today as YYYY-MM-DD in the visitor's local time (not UTC), so the calendar
+   never lets someone pick a day that has already passed. */
+const getToday = () => {
+  const d = new Date();
+  const pad = (n: number) => String(n).padStart(2, "0");
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+};
 
 const schema = z.object({
   name: z.string().min(2, "Name is required"),
@@ -18,15 +324,28 @@ const schema = z.object({
       /^\+971[- ]?5[0-9][- ]?\d{7}$/,
       "Enter a valid UAE mobile number (e.g. +971 50 1234567)",
     ),
+  preferredDate: z
+    .string()
+    .min(1, "Please pick a date")
+    .refine((v) => v >= getToday(), "Pick today or a later date"),
+  preferredTimeSlot: z.string().min(1, "Please select a time slot"),
 });
 
 type FormData = z.infer<typeof schema>;
 
-// Google Apps Script handles  gsheet(used samsonmendonca021acc for the google sheet) submission and pabbly handles crm and interakt submission,
+// Google Apps Script handles  gsheet(used samsonmendonca021 acc for the google sheet) submission and pabbly handles crm and interakt submission,
 // and the URL:https://docs.google.com/spreadsheets/d/1xs4IDB9_qBK1YaR37Wcu6XEszM2uO8TaSlWAYPdv00E/edit?usp=sharing
 
 const GOOGLE_SCRIPT_URL =
   "https://script.google.com/macros/s/AKfycbzzKDPITpkkZ9oq9-4-v5rlrjaOhSO0MzAMR6KzeXWabDNHLoX2oaiUrjbd90FKbMs/exec";
+
+const fieldClass =
+  "bg-white/5 border-white/10 text-white placeholder:text-white/20 h-11 rounded-xl focus-visible:ring-yellow focus-visible:bg-white/10 transition-all duration-300";
+
+const labelClass =
+  "text-[10px] font-black uppercase tracking-widest text-white/50 ml-2";
+
+const errorClass = "text-yellow text-[9px] font-bold ml-2";
 
 export default function LeadPopup() {
   const [isOpen, setIsOpen] = useState(false);
@@ -39,7 +358,10 @@ export default function LeadPopup() {
     handleSubmit,
     formState: { errors, isSubmitting },
     reset,
-  } = useForm<FormData>({ resolver: zodResolver(schema) });
+  } = useForm<FormData>({
+    resolver: zodResolver(schema),
+    defaultValues: { preferredDate: "", preferredTimeSlot: "" },
+  });
 
   useEffect(() => {
     const entryTimer = setTimeout(() => {
@@ -79,7 +401,7 @@ export default function LeadPopup() {
           ...data,
           coachingType: "Lead Popup",
           budget: "N/A",
-          message: "Lead captured from entry/exit popup (Redesign)",
+          message: `Lead captured from entry/exit popup (Redesign). Preferred slot: ${data.preferredDate}, ${data.preferredTimeSlot}`,
         }),
       });
       // With mode: "no-cors", the response is always opaque (status 0).
@@ -104,12 +426,15 @@ export default function LeadPopup() {
             className="absolute inset-0 bg-black/80 backdrop-blur-md"
             onClick={closePopup}
           />
+          {/* max-h + overflow-y-auto: the form is taller now, so on short
+              screens (phones in landscape, small laptops) it scrolls inside
+              the card instead of running off the viewport. */}
           <motion.div
             initial={{ scale: 0.9, opacity: 0, y: 40 }}
             animate={{ scale: 1, opacity: 1, y: 0 }}
             exit={{ scale: 0.9, opacity: 0, y: 40 }}
             transition={{ type: "spring", damping: 20, stiffness: 200 }}
-            className="relative bg-gradient-to-br from-[#552583]/95 via-[#552583]/90 to-black/95 w-full max-w-md rounded-[2.5rem] shadow-[0_0_80px_-15px_rgba(85,37,131,0.4)] overflow-hidden z-10 p-6 md:p-8 border border-white/10 backdrop-blur-xl"
+            className="relative bg-gradient-to-br from-[#552583]/95 via-[#552583]/90 to-black/95 w-full max-w-md max-h-[92svh] overflow-y-auto rounded-[2.5rem] shadow-[0_0_80px_-15px_rgba(85,37,131,0.4)] z-10 p-6 md:p-8 border border-white/10 backdrop-blur-xl"
           >
             <div className="absolute -top-24 -left-24 w-64 h-64 bg-yellow/5 rounded-full blur-[80px] pointer-events-none" />
             <div className="absolute -bottom-24 -right-24 w-64 h-64 bg-purple/20 rounded-full blur-[80px] pointer-events-none" />
@@ -157,67 +482,118 @@ export default function LeadPopup() {
                   </p>
                 </div>
 
-                <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+                <form
+                  onSubmit={handleSubmit(onSubmit)}
+                  className="space-y-4"
+                  noValidate
+                >
                   <div className="grid grid-cols-1 gap-4">
                     <div className="space-y-1">
-                      <Label
-                        htmlFor="popup-name"
-                        className="text-[10px] font-black uppercase tracking-widest text-white/50 ml-2"
-                      >
+                      <Label htmlFor="popup-name" className={labelClass}>
                         Full Name
                       </Label>
                       <Input
                         id="popup-name"
                         placeholder="John Smith"
-                        className="bg-white/5 border-white/10 text-white placeholder:text-white/20 h-11 rounded-xl focus-visible:ring-yellow focus-visible:bg-white/10 transition-all duration-300"
+                        className={fieldClass}
                         {...register("name")}
                       />
                       {errors.name && (
-                        <p className="text-yellow text-[9px] font-bold ml-2">
-                          {errors.name.message}
-                        </p>
+                        <p className={errorClass}>{errors.name.message}</p>
                       )}
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div className="space-y-1">
-                        <Label
-                          htmlFor="popup-email"
-                          className="text-[10px] font-black uppercase tracking-widest text-white/50 ml-2"
-                        >
+                        <Label htmlFor="popup-email" className={labelClass}>
                           Email
                         </Label>
                         <Input
                           id="popup-email"
                           type="email"
                           placeholder="john@example.com"
-                          className="bg-white/5 border-white/10 text-white placeholder:text-white/20 h-11 rounded-xl focus-visible:ring-yellow focus-visible:bg-white/10 transition-all duration-300"
+                          className={fieldClass}
                           {...register("email")}
                         />
                         {errors.email && (
-                          <p className="text-yellow text-[9px] font-bold ml-2">
-                            {errors.email.message}
-                          </p>
+                          <p className={errorClass}>{errors.email.message}</p>
                         )}
                       </div>
 
                       <div className="space-y-1">
-                        <Label
-                          htmlFor="popup-phone"
-                          className="text-[10px] font-black uppercase tracking-widest text-white/50 ml-2"
-                        >
+                        <Label htmlFor="popup-phone" className={labelClass}>
                           Phone
                         </Label>
                         <Input
                           id="popup-phone"
                           type="tel"
                           placeholder="+971 5X XXX"
-                          className="bg-white/5 border-white/10 text-white placeholder:text-white/20 h-11 rounded-xl focus-visible:ring-yellow focus-visible:bg-white/10 transition-all duration-300"
+                          className={fieldClass}
                           {...register("phone")}
                         />
                         {errors.phone && (
-                          <p className="text-yellow text-[9px] font-bold ml-2">
-                            {errors.phone.message}
+                          <p className={errorClass}>{errors.phone.message}</p>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* ---- Preferred date + time slot ---- */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div className="space-y-1">
+                        <Label htmlFor="popup-date" className={labelClass}>
+                          Preferred Date
+                        </Label>
+                        {/* Native date input: opens the browser's calendar
+                            picker. color-scheme:dark makes the calendar icon
+                            and the picker readable on the dark card. */}
+                        <Input
+                          id="popup-date"
+                          type="date"
+                          min={getToday()}
+                          className={`${fieldClass} [color-scheme:dark] block w-full`}
+                          {...register("preferredDate")}
+                        />
+                        {errors.preferredDate && (
+                          <p className={errorClass}>
+                            {errors.preferredDate.message}
+                          </p>
+                        )}
+                      </div>
+
+                      <div className="space-y-1">
+                        <Label htmlFor="popup-time" className={labelClass}>
+                          Time Slot
+                        </Label>
+                        <div className="relative">
+                          <select
+                            id="popup-time"
+                            className={`${fieldClass} w-full appearance-none border px-3 pr-9 text-sm outline-none focus-visible:ring-2 [&:invalid]:text-white/40`}
+                            {...register("preferredTimeSlot")}
+                          >
+                            <option
+                              value=""
+                              className="bg-[#2a1147] text-white/60"
+                            >
+                              Select
+                            </option>
+                            {TIME_SLOTS.map((slot) => (
+                              <option
+                                key={slot}
+                                value={slot}
+                                className="bg-[#2a1147] text-white"
+                              >
+                                {slot}
+                              </option>
+                            ))}
+                          </select>
+                          <ChevronDown
+                            className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-white/50"
+                            aria-hidden="true"
+                          />
+                        </div>
+                        {errors.preferredTimeSlot && (
+                          <p className={errorClass}>
+                            {errors.preferredTimeSlot.message}
                           </p>
                         )}
                       </div>

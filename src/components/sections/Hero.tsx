@@ -1,7 +1,7 @@
 "use client";
 
-import { motion, useAnimationControls, useReducedMotion } from "framer-motion";
-import { useEffect, useRef, useState } from "react";
+import { motion, useReducedMotion } from "framer-motion";
+import { useEffect, useRef } from "react";
 import Image from "next/image";
 import { ArrowUpRight } from "lucide-react";
 
@@ -52,136 +52,186 @@ const HERO_SLIDES: HeroSlide[] = [
     src: "/hero-slides/satish-shoulder-mobility.jpg",
     alt: "Satish, a Dubai professional, regained shoulder strength and mobility with ASF Coaching",
   },
+  {
+    src: "/hero-slides/Umme Salma, Dubai Resident.jpeg",
+    alt: "Umme Salma, Dubai Resident",
+  },
+  {
+    src: "/hero-slides/Dan, Dubai Resident.jpeg",
+    alt: "Dan, Dubai Resident",
+  },
+  {
+    src: "/hero-slides/Hannah, Dubai Resident.jpeg",
+    alt: "Hannah, Dubai Resident",
+  },
 ];
 
-/* Cards kept in the DOM. Enough to fill the widest viewport plus a couple
-   spilling past each edge, so there is always something to slide in. */
-const RENDERED = 10;
+/* Continuous drift speed (px per second) and how long the strip stays still
+   after the visitor last touched, dragged or scrolled it. */
+const SPEED = 45;
+const IDLE_MS = 2500;
 
-/* Dwell time between steps, in ms, and how long one step takes. */
-const ROTATE_MS = 3200;
-const STEP_MS = 850;
-
-function SlideCard({ slide }: { slide: HeroSlide }) {
-  return (
-    <Image
-      src={slide.src}
-      alt={slide.alt}
-      fill
-      sizes="(max-width: 768px) 160px, 240px"
-      /* The strip is above the fold, so these must not lazy-load — the
-         default would leave it blank until the viewport observer fires.
-         Seven files, ~436KB total. */
-      loading="eager"
-      className="object-cover"
-    />
-  );
-}
-
-type StripItem = { id: number; cardIndex: number };
+/* The slide list is rendered several times back to back. The scroll position
+   is kept inside the second copy and silently jumped by exactly one copy's
+   width whenever it leaves it — the copies are identical, so the jump is
+   invisible and the strip never runs out in either direction. Four copies
+   cover viewports up to roughly twice the width of one set. */
+const COPIES = 4;
 
 function CardStrip() {
   const reduceMotion = useReducedMotion();
-  const rowRef = useRef<HTMLDivElement>(null);
-  const controls = useAnimationControls();
-
-  /* The whole row travels as one piece. Swapping each card in place — which
-     is what this did before — changes all of them at the same instant and
-     reads as a flicker rather than a carousel. Here the strip slides left by
-     exactly one card, then the card that has gone off the left edge is
-     recycled to the tail and the row snaps back to zero. Because the row is
-     already one card further along at that point, the snap is invisible. */
-  const [items, setItems] = useState<StripItem[]>(() =>
-    Array.from({ length: RENDERED }, (_, i) => ({
-      id: i,
-      cardIndex: i % HERO_SLIDES.length,
-    })),
-  );
-
-  const nextId = useRef(RENDERED);
-  const nextCard = useRef(RENDERED % HERO_SLIDES.length);
+  const scrollerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (reduceMotion) return;
+    const el = scrollerRef.current;
+    if (!el) return;
 
-    let cancelled = false;
-    let id: ReturnType<typeof setInterval> | undefined;
+    let setW = 0; // pixel width of one full set of slides (cards + gaps)
+    let raf = 0;
+    let last = performance.now();
+    let pos = 0; // float scroll position, so slow drift isn't lost to rounding
+    let lastSet = 0; // scrollLeft as of our last write, to spot user scrolls
+    let pressed = false;
+    let wasAuto = false;
+    let lastInteract = performance.now() - IDLE_MS; // drift from first paint
 
-    const step = async () => {
-      const row = rowRef.current;
-      if (!row || row.children.length < 2) return;
-
-      /* Measure rather than hard-code: card width is set per breakpoint, so
-         the distance to advance changes with the viewport. The gap between
-         the first two children is exactly that distance. */
-      const first = row.children[0] as HTMLElement;
-      const second = row.children[1] as HTMLElement;
-      const pitch = second.offsetLeft - first.offsetLeft;
-      if (!pitch) return;
-
-      await controls.start({
-        x: -pitch,
-        transition: { duration: STEP_MS / 1000, ease: [0.65, 0, 0.35, 1] },
-      });
-      if (cancelled) return;
-
-      setItems((prev) => [
-        ...prev.slice(1),
-        { id: nextId.current++, cardIndex: nextCard.current },
-      ]);
-      nextCard.current = (nextCard.current + 1) % HERO_SLIDES.length;
-      controls.set({ x: 0 });
+    const measure = () => {
+      const a = el.children[0] as HTMLElement | undefined;
+      const b = el.children[HERO_SLIDES.length] as HTMLElement | undefined;
+      if (a && b) setW = b.offsetLeft - a.offsetLeft;
     };
 
-    /* Pause while the tab is hidden: the step animation is driven by rAF,
-       which does not run in a background tab, so the interval would stack up
-       steps that never resolve. */
-    const stop = () => {
-      if (id) clearInterval(id);
-      id = undefined;
+    /* Keep scrollLeft inside [setW, 2*setW). */
+    const wrap = () => {
+      if (!setW) return;
+      if (el.scrollLeft >= setW * 2) el.scrollLeft -= setW;
+      else if (el.scrollLeft < setW) el.scrollLeft += setW;
     };
-    const start = () => {
-      stop();
-      id = setInterval(step, ROTATE_MS);
-    };
-    const onVisibilityChange = () => (document.hidden ? stop() : start());
 
-    if (!document.hidden) start();
-    document.addEventListener("visibilitychange", onVisibilityChange);
+    const touch = () => {
+      lastInteract = performance.now();
+    };
+
+    /* ---- Mouse drag-to-scroll (touch/trackpad scroll natively) ---- */
+    let dragging = false;
+    let startX = 0;
+    let startScroll = 0;
+
+    const onDown = (e: PointerEvent) => {
+      pressed = true;
+      touch();
+      if (e.pointerType !== "mouse" || e.button !== 0) return;
+      dragging = true;
+      startX = e.clientX;
+      startScroll = el.scrollLeft;
+      el.style.cursor = "grabbing";
+    };
+    const onMove = (e: PointerEvent) => {
+      if (!dragging) return;
+      touch();
+      el.scrollLeft = startScroll - (e.clientX - startX);
+    };
+    const onUp = () => {
+      pressed = false;
+      touch();
+      if (!dragging) return;
+      dragging = false;
+      el.style.cursor = "";
+    };
+
+    /* A scroll we didn't cause is the visitor's: hold the drift, then wrap. */
+    const onScroll = () => {
+      if (Math.abs(el.scrollLeft - lastSet) > 2) touch();
+      wrap();
+      lastSet = el.scrollLeft;
+    };
+
+    const loop = (t: number) => {
+      const dt = Math.min(t - last, 64);
+      last = t;
+
+      const auto =
+        !reduceMotion && !pressed && setW > 0 && t - lastInteract > IDLE_MS;
+
+      if (auto) {
+        if (!wasAuto) pos = el.scrollLeft;
+        pos += (SPEED * dt) / 1000;
+        if (pos >= setW * 2) pos -= setW;
+        el.scrollLeft = pos;
+      }
+      wasAuto = auto;
+      lastSet = el.scrollLeft;
+      raf = requestAnimationFrame(loop);
+    };
+
+    measure();
+    el.scrollLeft = setW; // start on the second copy
+    pos = lastSet = el.scrollLeft;
+
+    el.addEventListener("pointerdown", onDown);
+    window.addEventListener("pointermove", onMove);
+    window.addEventListener("pointerup", onUp);
+    window.addEventListener("pointercancel", onUp);
+    el.addEventListener("scroll", onScroll, { passive: true });
+    el.addEventListener("wheel", touch, { passive: true });
+    el.addEventListener("keydown", touch);
+    window.addEventListener("resize", measure);
+    raf = requestAnimationFrame(loop);
 
     return () => {
-      cancelled = true;
-      stop();
-      document.removeEventListener("visibilitychange", onVisibilityChange);
+      cancelAnimationFrame(raf);
+      el.removeEventListener("pointerdown", onDown);
+      window.removeEventListener("pointermove", onMove);
+      window.removeEventListener("pointerup", onUp);
+      window.removeEventListener("pointercancel", onUp);
+      el.removeEventListener("scroll", onScroll);
+      el.removeEventListener("wheel", touch);
+      el.removeEventListener("keydown", touch);
+      window.removeEventListener("resize", measure);
     };
-  }, [reduceMotion, controls]);
+  }, [reduceMotion]);
+
+  const items = Array.from({ length: COPIES }, (_, copy) =>
+    HERO_SLIDES.map((slide, i) => ({ slide, copy, i })),
+  ).flat();
 
   return (
-    /* Flat, level row that runs wider than the viewport and is clipped at
-       both edges by the panel, so the outermost cards read as continuing
-       past the frame. Card size is set per breakpoint rather than by a CSS
-       scale, so the layout box always matches what is drawn. */
     <motion.div
-      aria-hidden="true"
       initial={reduceMotion ? false : { opacity: 0, y: 60 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.8, delay: reduceMotion ? 0 : 0.7 }}
       className="mt-6 w-full md:mt-8"
     >
-      <motion.div
-        ref={rowRef}
-        animate={controls}
-        className="flex justify-center gap-2 md:gap-3"
+      {/* Endless horizontal strip. It drifts on its own from first load and
+          can be swiped, dragged, trackpad-scrolled or arrow-keyed at any time;
+          it pauses while the visitor is interacting and drifts on again
+          after a short idle. */}
+      <div
+        ref={scrollerRef}
+        role="region"
+        aria-label="Client transformation stories"
+        tabIndex={0}
+        className="flex cursor-grab select-none gap-3 overflow-x-auto overscroll-x-contain px-4 pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden sm:px-6 md:gap-4 lg:px-[max(1.5rem,calc((100vw-72rem)/2+1.5rem))] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/60"
       >
-        {items.map((item) => (
+        {items.map(({ slide, copy, i }) => (
           <div
-            key={item.id}
-            className="relative aspect-[4/5] w-[168px] shrink-0 overflow-hidden rounded-2xl border border-white/60 bg-[#3B1668] shadow-[0_24px_50px_-16px_rgba(23,9,31,0.6)] sm:w-[190px] md:w-[204px] lg:w-[224px]"
+            key={`${copy}-${i}`}
+            aria-hidden={copy !== 1}
+            className="relative aspect-[4/5] w-[68vw] max-w-[260px] shrink-0 overflow-hidden rounded-2xl border border-white/60 bg-[#3B1668] shadow-[0_24px_50px_-16px_rgba(23,9,31,0.6)] sm:w-[210px] md:w-[224px] lg:w-[250px]"
           >
-            <SlideCard slide={HERO_SLIDES[item.cardIndex]} />
+            <Image
+              src={slide.src}
+              alt={copy === 1 ? slide.alt : ""}
+              fill
+              draggable={false}
+              sizes="(max-width: 640px) 68vw, 250px"
+              /* Only the copy that is on screen at load needs to be eager. */
+              loading={copy === 1 && i < 5 ? "eager" : "lazy"}
+              className="pointer-events-none object-cover"
+            />
           </div>
         ))}
-      </motion.div>
+      </div>
     </motion.div>
   );
 }
@@ -214,110 +264,99 @@ export default function Hero() {
   });
 
   return (
+    /* The section itself is the full-bleed panel: it fills the viewport
+       width and at least the full viewport height (svh keeps it correct
+       behind mobile browser toolbars), with no rounded corners or dark
+       gutters. The gradient lives on this element. */
     <section
       id="hero"
-      className="relative isolate overflow-hidden bg-[#17091f]"
+      className="relative isolate flex min-h-svh w-full flex-col justify-between overflow-hidden"
+      style={{
+        background:
+          "linear-gradient(180deg, #1B0A2E 0%, #3B1668 26%, #552583 52%, #7B2CBF 78%, #9D4EDD 100%)",
+      }}
     >
-      {/* ---- Sky --------------------------------------------------- */}
-      {/* The gradient is the container's own background: painting it on a
-          child would sit behind the wrapper and never show. */}
-      <div
-        /* top corners only — the panel runs flush to the left, right and
-           bottom edges of the viewport */
-        className="relative flex min-h-svh flex-col justify-between overflow-hidden rounded-t-[2rem]"
-        style={{
-          background:
-            "linear-gradient(180deg, #1B0A2E 0%, #3B1668 26%, #552583 52%, #7B2CBF 78%, #9D4EDD 100%)",
-        }}
-      >
-        {/* Portrait, bled into the right half of the panel. */}
-        <div className="pointer-events-none absolute inset-y-0 right-0 w-full md:w-[54%]">
-          <Image
-            src={HERO_PORTRAIT}
-            alt=""
-            fill
-            priority
-            sizes="(max-width: 768px) 100vw, 54vw"
-            className="object-cover object-top"
-            /* Fade the photo itself rather than laying a colour over it. The
-               panel behind is a vertical gradient, so no single overlay
-               colour can match it at every height — one always leaves a hard
-               seam down the photo's left edge. Masking lets the panel's own
-               gradient show through instead. */
-            style={{
-              WebkitMaskImage:
-                "linear-gradient(to right, transparent 0%, #000 58%), linear-gradient(to top, transparent 0%, #000 34%)",
-              maskImage:
-                "linear-gradient(to right, transparent 0%, #000 58%), linear-gradient(to top, transparent 0%, #000 34%)",
-              WebkitMaskComposite: "source-in",
-              maskComposite: "intersect",
-            }}
-          />
-          {/* On mobile there is no room for the text to sit beside the photo,
-              so it sits on top of it. Weighted towards the top, where the
-              headline lands on the brightest part of the shot and would
-              otherwise be white-on-white. */}
-          <div className="absolute inset-0 bg-gradient-to-b from-[#1B0A2E] via-[#1B0A2E]/88 to-[#3B1668]/45 md:hidden" />
-        </div>
-
-        {/* Soft cloud banks — layered radial gradients rather than photos,
-            so the hero stays asset-free and sharp at every viewport. */}
-        <div
-          className="pointer-events-none absolute inset-0 opacity-80"
+      {/* Portrait, bled into the right of the panel (full width on mobile). */}
+      <div className="pointer-events-none absolute inset-y-0 right-0 w-full md:w-[54%]">
+        <Image
+          src={HERO_PORTRAIT}
+          alt=""
+          fill
+          priority
+          sizes="(max-width: 768px) 100vw, 54vw"
+          className="object-cover object-top"
+          /* Fade the photo itself rather than laying a colour over it, so
+             the panel's own gradient shows through with no hard seam. */
           style={{
-            background: [
-              "radial-gradient(58% 30% at 10% 82%, rgba(255,255,255,0.30), transparent 68%)",
-              "radial-gradient(64% 34% at 50% 108%, rgba(241,255,3,0.20), transparent 66%)",
-              "radial-gradient(44% 24% at 28% 100%, rgba(255,255,255,0.34), transparent 70%)",
-            ].join(","),
+            WebkitMaskImage:
+              "linear-gradient(to right, transparent 0%, #000 58%), linear-gradient(to top, transparent 0%, #000 34%)",
+            maskImage:
+              "linear-gradient(to right, transparent 0%, #000 58%), linear-gradient(to top, transparent 0%, #000 34%)",
+            WebkitMaskComposite: "source-in",
+            maskComposite: "intersect",
           }}
         />
+        {/* On mobile the text sits on top of the photo, so darken it,
+            weighted towards the top where the headline lands. */}
+        <div className="absolute inset-0 bg-gradient-to-b from-[#1B0A2E] via-[#1B0A2E]/88 to-[#3B1668]/45 md:hidden" />
+      </div>
 
-        {/* ---- Content --------------------------------------------- */}
-        <div className="relative z-10 mx-auto w-full max-w-6xl px-4 pt-28 sm:px-6 md:pt-36">
-          <div className="max-w-xl md:max-w-[70%]">
-            <motion.h1
-              {...rise(0.05)}
-              className="font-sans text-[clamp(2.1rem,5.2vw,4rem)] font-bold leading-[1.06] tracking-[-0.03em] text-white"
+      {/* Soft cloud banks */}
+      <div
+        className="pointer-events-none absolute inset-0 opacity-80"
+        style={{
+          background: [
+            "radial-gradient(58% 30% at 10% 82%, rgba(255,255,255,0.30), transparent 68%)",
+            "radial-gradient(64% 34% at 50% 108%, rgba(241,255,3,0.20), transparent 66%)",
+            "radial-gradient(44% 24% at 28% 100%, rgba(255,255,255,0.34), transparent 70%)",
+          ].join(","),
+        }}
+      />
+
+      {/* ---- Content ------------------------------------------------ */}
+      <div className="relative z-10 mx-auto w-full max-w-6xl px-4 pt-28 sm:px-6 md:pt-36">
+        <div className="max-w-xl md:max-w-[70%]">
+          <motion.h1
+            {...rise(0.05)}
+            className="font-sans text-[clamp(2.1rem,5.2vw,4rem)] font-bold leading-[1.06] tracking-[-0.03em] text-white"
+          >
+            Adaptive. Sustainable.
+            <br />
+            <span className="text-white/55">Fitness.</span>
+          </motion.h1>
+
+          <motion.p
+            {...rise(0.25)}
+            className="mt-6 max-w-md text-sm leading-relaxed text-white/80 md:mt-9 md:text-base md:text-white/70"
+          >
+            Specialized personal training on-demand. Expert coaches come to you
+            — at home, in your gym, or anywhere you prefer.
+          </motion.p>
+
+          <motion.div {...rise(0.45)} className="mt-8 md:mt-10">
+            <a
+              href="#contact"
+              className="group inline-flex h-12 items-center gap-3 rounded-full bg-accent pl-6 pr-2 text-[0.7rem] font-bold uppercase tracking-[0.16em] text-black transition hover:shadow-[0_16px_40px_-10px_rgba(241,255,3,0.6)] sm:pl-7 sm:text-xs sm:tracking-[0.18em]"
             >
-              Adaptive. Sustainable.
-              <br />
-              <span className="text-white/55">Fitness.</span>
-            </motion.h1>
+              Book Free Assessment
+              <span className="flex h-9 w-9 items-center justify-center rounded-full bg-black transition-transform duration-300 group-hover:rotate-45">
+                <ArrowUpRight className="h-4 w-4 text-accent" />
+              </span>
+            </a>
+          </motion.div>
 
-            <motion.p
-              {...rise(0.25)}
-              className="mt-7 max-w-md text-sm leading-relaxed text-white/70 md:mt-9 md:text-base"
-            >
-              Specialized personal training on-demand. Expert coaches come to
-              you — at home, in your gym, or anywhere you prefer.
-            </motion.p>
-
-            <motion.div {...rise(0.45)} className="mt-9 md:mt-10">
-              <a
-                href="#contact"
-                className="group inline-flex h-12 items-center gap-3 rounded-full bg-accent pl-7 pr-2 text-xs font-bold uppercase tracking-[0.18em] text-black transition hover:shadow-[0_16px_40px_-10px_rgba(241,255,3,0.6)]"
-              >
-                Book Free Assessment
-                <span className="flex h-9 w-9 items-center justify-center rounded-full bg-black transition-transform duration-300 group-hover:rotate-45">
-                  <ArrowUpRight className="h-4 w-4 text-accent" />
-                </span>
-              </a>
-            </motion.div>
-
-            <motion.div {...rise(0.6)} className="mt-8 space-y-2">
-              <p className="text-xs text-white/70">
-                Rated 4.9/5 by 500+ clients in Dubai
-              </p>
-              <StarRating />
-            </motion.div>
-          </div>
+          <motion.div {...rise(0.6)} className="mt-6 space-y-2 md:mt-8">
+            <p className="text-xs text-white/70">
+              Rated 4.9/5 by 500+ clients in Dubai
+            </p>
+            <StarRating />
+          </motion.div>
         </div>
+      </div>
 
-        {/* ---- Card strip ------------------------------------------ */}
-        <div className="relative z-10 w-full overflow-hidden pb-6 md:pb-8">
-          <CardStrip />
-        </div>
+      {/* ---- Card strip (full width, scrollable) -------------------- */}
+      <div className="relative z-10 w-full pb-6 pt-8 md:pb-8">
+        <CardStrip />
       </div>
     </section>
   );

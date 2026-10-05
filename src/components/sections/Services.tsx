@@ -5,16 +5,14 @@ import {
   Dumbbell,
   Activity,
   Users,
-  Flower2,
   Zap,
   HeartPulse,
   Brain,
   Salad,
-  Footprints,
   Shield,
-  Box,
-  Hand,
-  Gamepad2,
+  Stethoscope,
+  PersonStanding,
+  Waves,
 } from "lucide-react";
 import { TextGenerateEffect } from "@/components/ui/TextGenerateEffect";
 
@@ -50,10 +48,11 @@ const services = [
       "Holistic mindset coaching to manage stress, improve focus, and build the mental resilience required for elite performance.",
   },
   {
-    title: "Yoga",
-    icon: <Flower2 size={32} />,
+    // Replaces "Yoga"
+    title: "Pain Management",
+    icon: <Waves size={32} />,
     description:
-      "Specialized recovery sessions combining flexibility, breathwork, and mobility to complement high-intensity training.",
+      "Movement-based techniques and guided recovery work to ease chronic and recurring pain, reduce stiffness, and help you move comfortably in training and daily life.",
   },
   {
     title: "Nutrition",
@@ -68,25 +67,26 @@ const services = [
       "Build real-world strength through bodyweight and structural control.",
   },
   {
-    title: "Locomotion",
-    icon: <Footprints size={32} />,
+    // Replaces "Locomotion"
+    title: "Injury Rehabilitation",
+    icon: <Stethoscope size={32} />,
     description:
-      "Explore crawling, rolling, and ground patterns that build awareness.",
-  },
-
-  {
-    title: "Object Manipulation",
-    icon: <Box size={32} />,
-    description:
-      "Learn coordination and rhythm through skillful interaction with tools.",
+      "Targeted recovery protocols designed to bridge the gap between clinical healing and high-performance training, helping you overcome setbacks safely.",
   },
   {
-    title: "Hand Balancing",
-    icon: <Hand size={32} />,
+    // Replaces "Object Manipulation"
+    title: "Posture Correction",
+    icon: <PersonStanding size={32} />,
     description:
-      "Build balance, strength, and control by learning to move upside down.",
+      "Specialized movement assessments and corrective exercises to realign structural imbalances, relieve chronic tension, and restore optimal daily mechanics.",
   },
-
+  {
+    // Replaces "Hand Balancing"
+    title: "Clinical Conditioning",
+    icon: <Shield size={32} />,
+    description:
+      "Customized conditioning programs tailored around specific medical considerations or chronic conditions to safely enhance physical capacity, strength, and overall vitality.",
+  },
   {
     title: "Mobility",
     icon: <HeartPulse size={32} />,

@@ -1,28 +1,28 @@
-'use client';
+"use client";
 
-import { useState, useEffect, useCallback, useRef } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Menu, X } from 'lucide-react';
-import { cn } from '@/lib/utils';
-import Image from 'next/image';
-import debounce from 'lodash/debounce';
+import { useState, useEffect, useCallback, useRef } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { Menu, X } from "lucide-react";
+import { cn } from "@/lib/utils";
+import Image from "next/image";
+import debounce from "lodash/debounce";
 
 const navLinks = [
-  { name: 'About Us', href: '#about' },
-  { name: 'Transformations', href: '#transformations' },
-  { name: 'Testimonials', href: '#testimonials' },
-  { name: 'Our Team', href: '#team' },
-  { name: 'Services', href: '#services' },
-  { name: 'FAQ', href: '#faq' },
-  // { name: 'Blog', href: '#blog' },
-  { name: 'Contact Us', href: '#contact' },
+  { name: "About Us", href: "/#about" },
+  { name: "Transformations", href: "/#transformations" },
+  { name: "Testimonials", href: "/#testimonials" },
+  { name: "Our Team", href: "/#team" },
+  { name: "Services", href: "/#services" },
+  { name: "FAQ", href: "#faq" },
+  // { name: 'Blog', href: '/#blog' },
+  { name: "Contact Us", href: "/#contact" },
 ];
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
   const [isVisible, setIsVisible] = useState(true);
   const [lastScrollY, setLastScrollY] = useState(0);
-  const [videoBgColor, setVideoBgColor] = useState('');
+  const [videoBgColor, setVideoBgColor] = useState("");
   const videoRef = useRef<HTMLVideoElement>(null);
 
   useEffect(() => {
@@ -31,10 +31,10 @@ export default function Navbar() {
 
     const handleLoadedData = () => {
       try {
-        const canvas = document.createElement('canvas');
+        const canvas = document.createElement("canvas");
         canvas.width = 1;
         canvas.height = 1;
-        const ctx = canvas.getContext('2d', { willReadFrequently: true });
+        const ctx = canvas.getContext("2d", { willReadFrequently: true });
         if (ctx) {
           ctx.drawImage(video, 0, 0, 1, 1);
           const [r, g, b] = ctx.getImageData(0, 0, 1, 1).data;
@@ -47,10 +47,10 @@ export default function Navbar() {
       }
     };
 
-    video.addEventListener('loadeddata', handleLoadedData);
+    video.addEventListener("loadeddata", handleLoadedData);
     if (video.readyState >= 2) handleLoadedData();
 
-    return () => video.removeEventListener('loadeddata', handleLoadedData);
+    return () => video.removeEventListener("loadeddata", handleLoadedData);
   }, []);
 
   const handleScroll = useCallback(
@@ -63,12 +63,12 @@ export default function Navbar() {
       }
       setLastScrollY(currentScrollY);
     }, 10),
-    [lastScrollY]
+    [lastScrollY],
   );
 
   useEffect(() => {
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
   }, [handleScroll]);
 
   return (
@@ -77,11 +77,11 @@ export default function Navbar() {
         style={videoBgColor ? { backgroundColor: videoBgColor } : undefined}
         initial={{ y: -100, opacity: 0 }}
         animate={{ y: isVisible ? 0 : -100, opacity: isVisible ? 1 : 0 }}
-        transition={{ duration: 0.5, ease: 'easeInOut' }}
+        transition={{ duration: 0.5, ease: "easeInOut" }}
         className={cn(
           "fixed top-0 left-0 right-0 z-50 backdrop-blur-md border-b border-white/10 transition-all duration-300",
           !videoBgColor && "bg-primary/95",
-          !isVisible && "pointer-events-none"
+          !isVisible && "pointer-events-none",
         )}
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -123,7 +123,7 @@ export default function Navbar() {
                 whileTap={{ scale: 0.97 }}
                 className="bg-accent text-dark px-6 py-3 rounded-full text-sm font-bold shadow-lg hover:bg-yellow transition-all"
               >
-                <a href='#contact'>   Register Your Interest</a>
+                <a href="#contact"> Register Your Interest</a>
               </motion.button>
             </div>
 
@@ -152,14 +152,16 @@ export default function Navbar() {
               className="fixed inset-0 bg-black/50 z-[60] backdrop-blur-sm"
             />
             <motion.div
-              style={videoBgColor ? { backgroundColor: videoBgColor } : undefined}
-              initial={{ x: '100%' }}
+              style={
+                videoBgColor ? { backgroundColor: videoBgColor } : undefined
+              }
+              initial={{ x: "100%" }}
               animate={{ x: 0 }}
-              exit={{ x: '100%' }}
+              exit={{ x: "100%" }}
               transition={{ duration: 0.35, ease: "easeInOut" }}
               className={cn(
                 "fixed top-0 right-0 bottom-0 w-full sm:w-[360px] z-[70] shadow-2xl p-8 flex flex-col",
-                !videoBgColor && "bg-purple"
+                !videoBgColor && "bg-purple",
               )}
             >
               <div className="flex justify-between items-center mb-12">
@@ -173,23 +175,32 @@ export default function Navbar() {
                   height={48}
                   className="h-12 w-auto object-contain"
                 />
-                <button onClick={() => setIsOpen(false)} className="p-2 text-white">
+                <button
+                  onClick={() => setIsOpen(false)}
+                  className="p-2 text-white"
+                >
                   <X size={28} />
                 </button>
               </div>
 
               <div className="flex flex-col space-y-6">
-                {navLinks.filter(l => l.name !== 'Contact Us').map((link) => (
-                  <a
-                    key={link.name}
-                    href={link.href}
-                    onClick={() => setIsOpen(false)}
-                    className="text-lg font-semibold text-white/90 transition-colors border-b border-white/10 pb-2"
-                  >
-                    {link.name}
-                  </a>
-                ))}
-                <a href="#contact" onClick={() => setIsOpen(false)} className="mt-4 bg-yellow text-black px-6 py-4 rounded-full text-sm font-bold shadow-lg hover:bg-white transition-all text-center">
+                {navLinks
+                  .filter((l) => l.name !== "Contact Us")
+                  .map((link) => (
+                    <a
+                      key={link.name}
+                      href={link.href}
+                      onClick={() => setIsOpen(false)}
+                      className="text-lg font-semibold text-white/90 transition-colors border-b border-white/10 pb-2"
+                    >
+                      {link.name}
+                    </a>
+                  ))}
+                <a
+                  href="#contact"
+                  onClick={() => setIsOpen(false)}
+                  className="mt-4 bg-yellow text-black px-6 py-4 rounded-full text-sm font-bold shadow-lg hover:bg-white transition-all text-center"
+                >
                   Register Your Interest
                 </a>
               </div>

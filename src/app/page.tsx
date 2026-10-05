@@ -6,6 +6,7 @@ import GoogleReviews from "@/components/sections/GoogleReviews";
 import InstagramGrid from "@/components/sections/InstagramGrid";
 import Accountability from "@/components/sections/Accountability";
 import ServicesTest from "@/components/sections/ServicesTest";
+import LeadershipTeam from "@/components/sections/LeadershipTeam";
 
 // Below-the-fold sections
 const About = dynamic(() => import("@/components/sections/About"));
@@ -34,8 +35,9 @@ export default function Home() {
       <Transformations />
       <Testimonials />
       <GoogleReviews />
-      <Founder />
-      <Team />
+      <LeadershipTeam />
+      {/* <Founder />
+      <Team /> */}
       {/* <ServicesTest /> */}
       {/* removed services on 29/6/26 after the call to improve the section  */}
       <Services />

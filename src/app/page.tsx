@@ -21,7 +21,7 @@ const Founder = dynamic(() => import("@/components/sections/Founder"));
 const Services = dynamic(() => import("@/components/sections/Services"));
 const Stats = dynamic(() => import("@/components/sections/Stats"));
 const FAQ = dynamic(() => import("@/components/sections/FAQ"));
-// const Blogs = dynamic(() => import('@/components/sections/Blogs'));
+const Blogs = dynamic(() => import('@/components/sections/Blogs'));
 const ContactFooter = dynamic(
   () => import("@/components/sections/ContactFooter"),
 );
@@ -45,7 +45,7 @@ export default function Home() {
       <Accountability />
       <Stats />
       <FAQ />
-      {/* <Blogs /> */}
+      <Blogs />
       <MapSection />
 
       <ContactFooter />

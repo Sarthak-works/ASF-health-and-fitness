@@ -1,28 +1,28 @@
 module.exports = {
   content: [
-    './src/**/*.{js,ts,jsx,tsx,mdx}',
-    './components/**/*.{js,ts,jsx,tsx,mdx}',
-    './app/**/*.{js,ts,jsx,tsx,mdx}',
+    "./src/**/*.{js,ts,jsx,tsx,mdx}",
+    "./components/**/*.{js,ts,jsx,tsx,mdx}",
+    "./app/**/*.{js,ts,jsx,tsx,mdx}",
   ],
   theme: {
     extend: {
       colors: {
         primary: {
-          DEFAULT: '#552583',
-          foreground: '#FFFFFF',
+          DEFAULT: "#552583",
+          foreground: "#FFFFFF",
         },
         accent: {
-          DEFAULT: '#F1FF03',
-          foreground: '#000000',
+          DEFAULT: "#F1FF03",
+          foreground: "#000000",
         },
-        background: '#FFFFFF',
-        dark: '#1A1A1A',
-        purple: '#552583',
-        yellow: '#F1FF03',
+        background: "#FFFFFF",
+        dark: "#1A1A1A",
+        purple: "#552583",
+        yellow: "#F1FF03",
       },
       fontFamily: {
-        heading: ['var(--font-playfair)', 'serif'],
-        sans: ['var(--font-montserrat)', 'sans-serif'],
+        heading: ["var(--font-playfair)", "serif"],
+        sans: ["var(--font-montserrat)", "sans-serif"],
       },
       animation: {
         spotlight: "spotlight 2s ease .75s 1 forwards",
@@ -50,5 +50,6 @@ module.exports = {
       },
     },
   },
-  plugins: [],
-}
+
+  plugins: [require("@tailwindcss/typography")],
+};

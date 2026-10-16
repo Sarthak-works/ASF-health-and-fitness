@@ -86,6 +86,13 @@ RewriteCond %{HTTPS} off
 RewriteCond %{HTTP:X-Forwarded-Proto} !https
 RewriteRule ^(.*)$ https://%{HTTP_HOST}/$1 [R=301,L]
 
+# 1b. SEO landing pages moved to keyword URLs. Permanent redirects keep any
+#     links or rankings the old addresses picked up.
+RewriteRule ^corrective-exercise-specialist/?$ /corrective-exercise-specialist-in-dubai/ [R=301,L]
+RewriteRule ^fitness-trainer-dubai/?$ /fitness-trainer-in-dubai/ [R=301,L]
+RewriteRule ^online-personal-trainer-dubai/?$ /online-personal-trainer-in-dubai/ [R=301,L]
+RewriteRule ^online-fitness-coach-dubai/?$ /online-fitness-coach-in-dubai/ [R=301,L]
+
 # 2. Add the trailing slash to page URLs (/about -> /about/), never to files
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_URI} !/$

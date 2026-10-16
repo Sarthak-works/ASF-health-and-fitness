@@ -72,7 +72,15 @@ const formFields = [
 const GOOGLE_SCRIPT_URL =
   "https://script.google.com/macros/s/AKfycbzzKDPITpkkZ9oq9-4-v5rlrjaOhSO0MzAMR6KzeXWabDNHLoX2oaiUrjbd90FKbMs/exec";
 
-export default function ContactFooter() {
+export default function ContactFooter({
+  eyebrow = "START YOUR TRANSFORMATION",
+  title = "Get In Touch!",
+  subtitle = "Ready to begin? Schedule a free consultation today.",
+}: {
+  eyebrow?: string;
+  title?: string;
+  subtitle?: string;
+} = {}) {
   const [submitted, setSubmitted] = useState(false);
   const [submitError, setSubmitError] = useState(false);
   const [charCount, setCharCount] = useState(0);
@@ -160,13 +168,13 @@ export default function ContactFooter() {
             className="text-center mb-6 w-full"
           >
             <span className="text-accent text-[10px] font-bold uppercase tracking-[0.3em] mb-2 block">
-              START YOUR TRANSFORMATION
+              {eyebrow}
             </span>
             <h2 className="text-2xl md:text-3xl lg:text-4xl font-black text-white mb-2 tracking-tight">
-              Get In Touch!
+              {title}
             </h2>
             <TextGenerateEffect
-              words="Ready to begin? Schedule a free consultation today."
+              words={subtitle}
               className="text-gray-400 text-sm max-w-lg mx-auto leading-relaxed font-normal text-center"
             />
           </motion.div>

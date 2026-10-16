@@ -20,6 +20,9 @@ type Initial = {
   coverImage: string;
   content: string;
   published: boolean;
+  metaDescription?: string;
+  tags?: string[];
+  featured?: boolean;
 };
 
 export default function BlogForm({ initial }: { initial?: Initial }) {
@@ -31,6 +34,11 @@ export default function BlogForm({ initial }: { initial?: Initial }) {
   const [cover, setCover] = useState(initial?.coverImage ?? "");
   const [content, setContent] = useState(initial?.content ?? "");
   const [published, setPublished] = useState(initial?.published ?? true);
+  const [metaDescription, setMetaDescription] = useState(
+    initial?.metaDescription ?? "",
+  );
+  const [tags, setTags] = useState((initial?.tags ?? []).join(", "));
+  const [featured, setFeatured] = useState(initial?.featured ?? false);
   const [busy, setBusy] = useState(false);
 
   const onCover = async (f?: File) => {
@@ -66,6 +74,12 @@ export default function BlogForm({ initial }: { initial?: Initial }) {
           coverImage: cover,
           content,
           published,
+          metaDescription: metaDescription.trim(),
+          tags: tags
+            .split(",")
+            .map((t) => t.trim())
+            .filter(Boolean),
+          featured,
           updatedAt: serverTimestamp(),
           ...(isEdit ? {} : { createdAt: serverTimestamp() }),
         },
@@ -126,13 +140,53 @@ export default function BlogForm({ initial }: { initial?: Initial }) {
       </div>
 
       <div>
+        <label className={label}>Meta description (SEO)</label>
+        <textarea
+          className={input}
+          rows={2}
+          maxLength={200}
+          placeholder="Optional, 150–160 characters. Shown in Google results."
+          value={metaDescription}
+          onChange={(e) => setMetaDescription(e.target.value)}
+        />
+        <p
+          className={`mt-1 text-xs ${
+            metaDescription.length > 160 ? "text-red-600" : "text-gray-500"
+          }`}
+        >
+          {metaDescription.length}/160
+        </p>
+      </div>
+
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-end">
+        <div className="flex-1">
+          <label className={label}>Tags</label>
+          <input
+            className={input}
+            placeholder="Comma separated, e.g. nutrition, fat loss"
+            value={tags}
+            onChange={(e) => setTags(e.target.value)}
+          />
+        </div>
+        <label className="flex items-center gap-2 pb-3 text-sm text-gray-700">
+          <input
+            type="checkbox"
+            checked={featured}
+            onChange={(e) => setFeatured(e.target.checked)}
+            className="h-4 w-4 accent-[#7e22ce]"
+          />
+          Featured (shown first)
+        </label>
+      </div>
+
+      <div>
         <label className={label}>Cover image</label>
         {cover && (
           // eslint-disable-next-line @next/next/no-img-element
           <img
             src={cover}
             alt=""
-            className="mb-3 h-40 rounded-lg border border-gray-200 object-cover"
+            className="mb-3 aspect-[16/9] w-full max-w-md rounded-lg border border-gray-200 object-cover"
           />
         )}
         <input

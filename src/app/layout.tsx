@@ -4,6 +4,7 @@ import "./globals.css";
 import LenisProvider from "@/components/LenisProvider";
 import LeadPopup from "@/components/ui/LeadPopup";
 import WhatsAppWidget from "@/components/ui/WhatsAppWidget";
+import PublicOnly from "@/components/PublicOnly";
 import GoogleAnalytics from "@/components/GoogleAnalytics";
 import MetaPixel from "@/components/MetaPixel";
 import { ThemeProvider } from "next-themes";
@@ -50,8 +51,10 @@ export default function RootLayout({
             {children}
           </ThemeProvider>
 
-          <LeadPopup />
-          <WhatsAppWidget />
+          <PublicOnly>
+            <LeadPopup />
+            <WhatsAppWidget />
+          </PublicOnly>
           <CookieConsentBanner />
           <GoogleAnalytics />
           <MetaPixel />

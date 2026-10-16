@@ -82,3 +82,65 @@ html.lenis {
 .overflow-x-auto::-webkit-scrollbar {
   display: none;
 }
+
+/* ── Blog content: tables (admin editor + public post) ── */
+.blog-content table,
+.ProseMirror table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+  margin: 1.5em 0;
+  overflow: hidden;
+}
+.blog-content th,
+.blog-content td,
+.ProseMirror th,
+.ProseMirror td {
+  border: 1px solid #d1d5db;
+  padding: 0.5rem 0.75rem;
+  vertical-align: top;
+  position: relative;
+}
+.blog-content th,
+.ProseMirror th {
+  background: #f3e8ff;
+  font-weight: 600;
+  text-align: left;
+}
+.ProseMirror td > p,
+.ProseMirror th > p,
+.blog-content td > p,
+.blog-content th > p {
+  margin: 0;
+}
+.ProseMirror .selectedCell::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: rgba(126, 34, 206, 0.12);
+  pointer-events: none;
+}
+.ProseMirror .column-resize-handle {
+  position: absolute;
+  right: -2px;
+  top: 0;
+  bottom: -2px;
+  width: 4px;
+  background: #7e22ce;
+  pointer-events: none;
+}
+.ProseMirror.resize-cursor {
+  cursor: col-resize;
+}
+.ProseMirror .tableWrapper,
+.blog-content .tableWrapper {
+  overflow-x: auto;
+}
+.blog-content img {
+  border-radius: 1rem;
+}
+.blog-content a,
+.ProseMirror a {
+  color: #7e22ce;
+  text-decoration: underline;
+}

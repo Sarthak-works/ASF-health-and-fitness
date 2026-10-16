@@ -13,8 +13,8 @@ const navLinks = [
   { name: "Testimonials", href: "/#testimonials" },
   { name: "Our Team", href: "/#team" },
   { name: "Services", href: "/#services" },
-  { name: "FAQ", href: "#faq" },
-  // { name: 'Blog', href: '/#blog' },
+  { name: "FAQ", href: "/#faq" },
+  { name: "Blogs", href: "/#blog" },
   { name: "Contact Us", href: "/#contact" },
 ];
 
@@ -88,7 +88,7 @@ export default function Navbar() {
           <div className="flex justify-between items-center h-20">
             {/* Logo */}
             <div className="flex-shrink-0 flex items-center">
-              <a href="#hero" className="flex items-center">
+              <a href="/#hero" className="flex items-center">
                 <video
                   ref={videoRef}
                   crossOrigin="anonymous"
@@ -123,7 +123,7 @@ export default function Navbar() {
                 whileTap={{ scale: 0.97 }}
                 className="bg-accent text-dark px-6 py-3 rounded-full text-sm font-bold shadow-lg hover:bg-yellow transition-all"
               >
-                <a href="#contact"> Register Your Interest</a>
+                <a href="/#contact"> Register Your Interest</a>
               </motion.button>
             </div>
 
@@ -197,7 +197,7 @@ export default function Navbar() {
                     </a>
                   ))}
                 <a
-                  href="#contact"
+                  href="/#contact"
                   onClick={() => setIsOpen(false)}
                   className="mt-4 bg-yellow text-black px-6 py-4 rounded-full text-sm font-bold shadow-lg hover:bg-white transition-all text-center"
                 >

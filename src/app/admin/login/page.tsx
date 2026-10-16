@@ -17,7 +17,7 @@ export default function Login() {
     setError("");
     try {
       await signInWithEmailAndPassword(auth, email.trim(), password);
-      router.push("/admin/blogs");
+      router.push("/admin/dashboard");
     } catch (err) {
       const code = (err as { code?: string }).code ?? "unknown";
       setError("Login failed: " + code);
